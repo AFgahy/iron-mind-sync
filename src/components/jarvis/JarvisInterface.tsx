@@ -13,9 +13,13 @@ import {
   Shield, 
   Zap,
   Monitor,
-  Smartphone
+  Smartphone,
+  Download,
+  CheckCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePWA } from "@/hooks/usePWA";
+import { toast } from "@/hooks/use-toast";
 
 interface JarvisInterfaceProps {
   className?: string;
@@ -24,6 +28,7 @@ interface JarvisInterfaceProps {
 export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
   const [isSystemActive, setIsSystemActive] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const { isInstallable, isInstalled, installPWA } = usePWA();
 
   // Update time every second
   useEffect(() => {
@@ -36,6 +41,33 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
   const handleVoiceInput = (text: string) => {
     console.log("Voice input received:", text);
     // Here you would integrate with the chat interface
+  };
+
+  const handleInstallApp = async () => {
+    if (isInstalled) {
+      toast({
+        title: "J.A.R.V.I.S. bereits installiert",
+        description: "Die App ist bereits auf diesem Gerät installiert.",
+      });
+      return;
+    }
+
+    if (!isInstallable) {
+      toast({
+        title: "Installation nicht verfügbar",
+        description: "Nutzen Sie Chrome, Edge oder Firefox für die Installation.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const success = await installPWA();
+    if (success) {
+      toast({
+        title: "J.A.R.V.I.S. installiert!",
+        description: "Die App wurde erfolgreich auf Ihrem Gerät installiert.",
+      });
+    }
   };
 
   return (
@@ -198,26 +230,40 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
                 <Smartphone className="w-16 h-16 mx-auto mb-4 text-jarvis-primary" />
                 <h3 className="text-xl font-semibold jarvis-glow mb-2">Mobile Integration</h3>
                 <p className="text-muted-foreground mb-4">
-                  Verbinden Sie Ihr Android-Gerät für geräteübergreifende Steuerung
+                  Installieren Sie J.A.R.V.I.S. direkt auf Ihrem PC oder Handy für schnellen Zugriff
                 </p>
                 
                 <div className="space-y-4 max-w-md mx-auto">
                   <div className="text-left space-y-2">
                     <h4 className="font-semibold">Features:</h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>• Cross-Device Commands</li>
-                      <li>• Sichere Geräte-Kopplung</li>
-                      <li>• Synchronisierte Daten</li>
-                      <li>• Push Notifications</li>
+                      <li>• Funktioniert offline</li>
+                      <li>• Push-Benachrichtigungen</li>
+                      <li>• Native App-Erfahrung</li>
+                      <li>• Schneller Start vom Desktop</li>
                     </ul>
                   </div>
                   
-                  <Button className="w-full bg-gradient-jarvis">
-                    Android App herunterladen
+                  <Button 
+                    className="w-full bg-gradient-jarvis" 
+                    onClick={handleInstallApp}
+                    disabled={isInstalled}
+                  >
+                    {isInstalled ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        App installiert
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        {isInstallable ? 'App installieren' : 'App herunterladen'}
+                      </>
+                    )}
                   </Button>
                   
                   <p className="text-xs text-muted-foreground">
-                    QR-Code scannen oder direkt aus dem Play Store laden
+                    Funktioniert auf PC (Windows/Mac/Linux) und Mobile (Android/iOS)
                   </p>
                 </div>
               </div>

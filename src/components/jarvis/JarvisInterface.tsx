@@ -28,7 +28,7 @@ interface JarvisInterfaceProps {
 export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
   const [isSystemActive, setIsSystemActive] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const { isInstallable, isInstalled, installPWA } = usePWA();
+  const { isInstallable, isInstalled, installPWA, browserInfo } = usePWA();
 
   // Update time every second
   useEffect(() => {
@@ -52,10 +52,32 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       return;
     }
 
+    if (!browserInfo.supports) {
+      // Show instructions for unsupported browsers
+      toast({
+        title: "Browser-Alternative verwenden",
+        description: `${browserInfo.name} unterstützt die App-Installation nicht. Verwenden Sie Chrome, Edge oder Firefox für die beste Erfahrung.`,
+        variant: "destructive",
+        duration: 5000
+      });
+      
+      // For mobile, suggest adding to homescreen manually
+      if (/android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
+        setTimeout(() => {
+          toast({
+            title: "Alternative: Zum Startbildschirm hinzufügen",
+            description: "Tippen Sie auf das Menü Ihres Browsers und wählen 'Zum Startbildschirm hinzufügen'",
+            duration: 7000
+          });
+        }, 1000);
+      }
+      return;
+    }
+
     if (!isInstallable) {
       toast({
-        title: "Installation nicht verfügbar",
-        description: "Nutzen Sie Chrome, Edge oder Firefox für die Installation.",
+        title: "Noch nicht bereit",
+        description: "Warten Sie einen Moment und versuchen Sie es erneut.",
         variant: "destructive"
       });
       return;
@@ -257,13 +279,19 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
                     ) : (
                       <>
                         <Download className="w-4 h-4 mr-2" />
-                        {isInstallable ? 'App installieren' : 'App herunterladen'}
+                        {browserInfo.supports 
+                          ? (isInstallable ? 'App installieren' : 'App herunterladen')
+                          : 'Installation anzeigen'
+                        }
                       </>
                     )}
                   </Button>
                   
                   <p className="text-xs text-muted-foreground">
-                    Funktioniert auf PC (Windows/Mac/Linux) und Mobile (Android/iOS)
+                    {browserInfo.supports 
+                      ? "Funktioniert auf PC (Windows/Mac/Linux) und Mobile (Android/iOS)"
+                      : `Aktueller Browser: ${browserInfo.name} - Für Installation verwenden Sie Chrome, Edge oder Firefox`
+                    }
                   </p>
                 </div>
               </div>

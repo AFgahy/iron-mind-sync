@@ -9,10 +9,34 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
+// Detect browser type
+const getBrowserInfo = () => {
+  const userAgent = navigator.userAgent.toLowerCase();
+  
+  if (userAgent.includes('chrome') && !userAgent.includes('edg') && !userAgent.includes('samsung')) {
+    return { name: 'Chrome', supports: true };
+  }
+  if (userAgent.includes('edg')) {
+    return { name: 'Edge', supports: true };
+  }
+  if (userAgent.includes('firefox')) {
+    return { name: 'Firefox', supports: true };
+  }
+  if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+    return { name: 'Safari', supports: false };
+  }
+  if (userAgent.includes('samsung')) {
+    return { name: 'Samsung Internet', supports: false };
+  }
+  
+  return { name: 'Unbekannt', supports: false };
+};
+
 export const usePWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [browserInfo] = useState(getBrowserInfo());
 
   useEffect(() => {
     // Check if app is already installed
@@ -61,6 +85,7 @@ export const usePWA = () => {
   return {
     isInstallable,
     isInstalled,
-    installPWA
+    installPWA,
+    browserInfo
   };
 };

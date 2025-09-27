@@ -8,35 +8,59 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Jarvis Theme - Dark Tech Aesthetic */
+    --background: 220 20% 8%;
+    --foreground: 200 100% 85%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 220 25% 12%;
+    --card-foreground: 200 100% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 220 25% 10%;
+    --popover-foreground: 200 100% 90%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Arc Reactor Blue */
+    --primary: 200 100% 60%;
+    --primary-foreground: 220 20% 8%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 20% 15%;
+    --secondary-foreground: 200 100% 85%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 15% 20%;
+    --muted-foreground: 200 30% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Jarvis Accent - Bright Blue */
+    --accent: 195 100% 70%;
+    --accent-foreground: 220 20% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 80% 65%;
+    --destructive-foreground: 200 100% 90%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 20% 25%;
+    --input: 220 25% 15%;
+    --ring: 200 100% 60%;
 
-    --radius: 0.5rem;
+    /* Jarvis Specific Colors */
+    --jarvis-primary: 200 100% 60%;
+    --jarvis-glow: 200 100% 70%;
+    --jarvis-secondary: 195 100% 50%;
+    --jarvis-dark: 220 25% 10%;
+    --jarvis-glass: 200 50% 50%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(200 100% 60%), hsl(195 100% 70%));
+    --gradient-glow: radial-gradient(circle, hsl(200 100% 60% / 0.3), transparent 70%);
+    --gradient-panel: linear-gradient(145deg, hsl(220 25% 12% / 0.8), hsl(220 20% 8% / 0.9));
+
+    /* Shadows & Glows */
+    --shadow-jarvis: 0 0 30px hsl(200 100% 60% / 0.4);
+    --shadow-panel: 0 8px 32px hsl(220 20% 5% / 0.8);
+    --glow-text: 0 0 20px hsl(200 100% 70% / 0.6);
+
+    /* Animations */
+    --transition-jarvis: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --pulse-glow: pulse-glow 2s ease-in-out infinite alternate;
+
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -101,5 +125,52 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
   }
+}
+
+@layer components {
+  .jarvis-panel {
+    @apply relative overflow-hidden rounded-lg border border-border/30;
+    background: var(--gradient-panel);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .jarvis-glow {
+    text-shadow: var(--glow-text);
+  }
+
+  .arc-reactor {
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-jarvis), inset 0 0 20px hsl(200 100% 80% / 0.3);
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 20px hsl(200 100% 60% / 0.4), inset 0 0 20px hsl(200 100% 80% / 0.2);
+  }
+  100% {
+    box-shadow: 0 0 40px hsl(200 100% 60% / 0.8), inset 0 0 30px hsl(200 100% 80% / 0.4);
+  }
+}
+
+@keyframes matrix-rain {
+  0% { transform: translateY(-100vh); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes hologram-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.matrix-char {
+  animation: matrix-rain 3s linear infinite;
+  color: hsl(200 100% 60%);
+  text-shadow: 0 0 10px hsl(200 100% 60% / 0.8);
 }

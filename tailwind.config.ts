@@ -47,6 +47,13 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        jarvis: {
+          primary: "hsl(var(--jarvis-primary))",
+          glow: "hsl(var(--jarvis-glow))",
+          secondary: "hsl(var(--jarvis-secondary))",
+          dark: "hsl(var(--jarvis-dark))",
+          glass: "hsl(var(--jarvis-glass))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -57,6 +64,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      backgroundImage: {
+        'gradient-jarvis': 'var(--gradient-primary)',
+        'gradient-glow': 'var(--gradient-glow)',
+        'gradient-panel': 'var(--gradient-panel)',
+      },
+      boxShadow: {
+        'jarvis': 'var(--shadow-jarvis)',
+        'panel': 'var(--shadow-panel)',
       },
       borderRadius: {
         lg: "var(--radius)",

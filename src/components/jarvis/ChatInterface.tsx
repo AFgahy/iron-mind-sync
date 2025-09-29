@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Send, Bot, User, Zap } from "lucide-react";
+import { Send, Bot, User, Zap, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -20,6 +20,7 @@ interface ChatInterfaceProps {
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
+const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/text-to-speech`;
 
 export const ChatInterface = ({ className }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([
@@ -33,7 +34,9 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
   ]);
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [playingAudio, setPlayingAudio] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -155,6 +158,55 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
     }
   };
 
+  const speakMessage = async (messageId: string, text: string) => {
+    if (playingAudio === messageId) {
+      audioRef.current?.pause();
+      setPlayingAudio(null);
+      return;
+    }
+
+    try {
+      setPlayingAudio(messageId);
+      
+      const response = await fetch(TTS_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text, voice: 'Brian' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('TTS failed');
+      }
+
+      const { audioContent } = await response.json();
+      const audioBlob = new Blob(
+        [Uint8Array.from(atob(audioContent), c => c.charCodeAt(0))],
+        { type: 'audio/mpeg' }
+      );
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        setPlayingAudio(null);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('TTS error:', error);
+      toast.error('Sprachausgabe fehlgeschlagen');
+      setPlayingAudio(null);
+    }
+  };
+
   return (
     <div className={cn("jarvis-panel h-full flex flex-col", className)}>
       <div className="flex items-center gap-2 p-4 border-b border-border/30">
@@ -191,7 +243,22 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
               >
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                 <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-                  <span>{message.timestamp.toLocaleTimeString()}</span>
+                  <div className="flex items-center gap-2">
+                    <span>{message.timestamp.toLocaleTimeString()}</span>
+                    {message.role === "assistant" && message.content && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 w-6 p-0"
+                        onClick={() => speakMessage(message.id, message.content)}
+                      >
+                        <Volume2 className={cn(
+                          "w-3 h-3",
+                          playingAudio === message.id && "text-jarvis-primary animate-pulse"
+                        )} />
+                      </Button>
+                    )}
+                  </div>
                   {message.aiService && (
                     <Badge 
                       variant="secondary" 

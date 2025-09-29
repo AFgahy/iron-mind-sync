@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Send, Bot, User, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -18,12 +19,7 @@ interface ChatInterfaceProps {
   className?: string;
 }
 
-const AI_SERVICES = [
-  { name: "OpenAI GPT-4", color: "bg-green-500", icon: "🧠", specialty: "Programmierung, Logik, Mathematik" },
-  { name: "Claude Sonnet", color: "bg-purple-500", icon: "🤖", specialty: "Analyse, Schreiben, Verstehen" },
-  { name: "Gemini Pro", color: "bg-blue-500", icon: "💎", specialty: "Multimodal, Bilder, Kreativität" },
-  { name: "J.A.R.V.I.S. System", color: "bg-orange-500", icon: "⚡", specialty: "Systemsteuerung, Automation" }
-];
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
 
 export const ChatInterface = ({ className }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([
@@ -45,92 +41,93 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
     }
   }, [messages]);
 
-  const selectBestAI = (message: string): typeof AI_SERVICES[0] => {
-    const lowerMsg = message.toLowerCase();
-    
-    // System commands
-    if (lowerMsg.includes("öffne") || lowerMsg.includes("starte") || lowerMsg.includes("ausführen") || 
-        lowerMsg.includes("system") || lowerMsg.includes("computer")) {
-      return AI_SERVICES[3]; // J.A.R.V.I.S. System
-    }
-    
-    // Programming and technical
-    if (lowerMsg.includes("code") || lowerMsg.includes("programmier") || lowerMsg.includes("debug") ||
-        lowerMsg.includes("algorithmus") || lowerMsg.includes("berechne") || lowerMsg.includes("mathematik")) {
-      return AI_SERVICES[0]; // GPT-4
-    }
-    
-    // Images and creativity  
-    if (lowerMsg.includes("bild") || lowerMsg.includes("image") || lowerMsg.includes("design") ||
-        lowerMsg.includes("kreativ") || lowerMsg.includes("farbe") || lowerMsg.includes("visuell")) {
-      return AI_SERVICES[2]; // Gemini
-    }
-    
-    // Analysis and writing
-    if (lowerMsg.includes("analyse") || lowerMsg.includes("schreib") || lowerMsg.includes("erkläre") ||
-        lowerMsg.includes("zusammenfass") || lowerMsg.includes("verstehe") || lowerMsg.includes("denke")) {
-      return AI_SERVICES[1]; // Claude
-    }
-    
-    // Default to Claude for general questions
-    return AI_SERVICES[1];
-  };
+  const streamChat = async (chatMessages: Message[]) => {
+    try {
+      const response = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: chatMessages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
+        }),
+      });
 
-  const generateResponse = (userInput: string, selectedAI: typeof AI_SERVICES[0]): string => {
-    const lowerInput = userInput.toLowerCase();
-    
-    // System commands
-    if (lowerInput.includes("öffne youtube")) {
-      return "🎥 YouTube wird geöffnet... (Funktioniert nur in der installierten App, nicht im Browser-Preview)";
-    }
-    if (lowerInput.includes("öffne") || lowerInput.includes("starte")) {
-      const app = userInput.match(/öffne\s+(\w+)/i)?.[1] || "die Anwendung";
-      return `🚀 Versuche ${app} zu öffnen... (Systemsteuerung funktioniert nur in der installierten Desktop-App)`;
-    }
-    
-    // Programming questions
-    if (lowerInput.includes("code") || lowerInput.includes("programmier")) {
-      return `💻 ${selectedAI.name} analysiert Ihre Programmieranfrage. Ich kann Ihnen mit Code-Erstellung, Debugging und technischen Lösungen helfen. Was genau möchten Sie programmieren?`;
-    }
-    
-    // Math calculations
-    if (lowerInput.includes("berechne") || lowerInput.includes("rechne")) {
-      const mathMatch = userInput.match(/\d+[\+\-\*\/]\d+/);
-      if (mathMatch) {
-        try {
-          const result = eval(mathMatch[0]);
-          return `🔢 ${selectedAI.name}: ${mathMatch[0]} = ${result}`;
-        } catch {
-          return `🔢 ${selectedAI.name}: Mathematische Berechnung wird verarbeitet...`;
+      if (!response.ok || !response.body) {
+        if (response.status === 429) {
+          toast.error("Rate-Limit erreicht. Bitte warte einen Moment.");
+        } else if (response.status === 402) {
+          toast.error("Credits aufgebraucht. Bitte füge Credits hinzu.");
+        }
+        throw new Error("Stream konnte nicht gestartet werden");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+      let streamDone = false;
+      let assistantMessage = "";
+
+      // Create initial assistant message
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "",
+        role: "assistant",
+        aiService: "J.A.R.V.I.S. AI",
+        timestamp: new Date()
+      }]);
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              assistantMessage += content;
+              setMessages(prev => {
+                const newMessages = [...prev];
+                const lastMessage = newMessages[newMessages.length - 1];
+                if (lastMessage.role === "assistant") {
+                  lastMessage.content = assistantMessage;
+                }
+                return newMessages;
+              });
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
         }
       }
-      return `🔢 ${selectedAI.name}: Welche Berechnung soll ich durchführen?`;
+
+      setIsProcessing(false);
+    } catch (error) {
+      console.error("Chat error:", error);
+      toast.error("Fehler beim Abrufen der AI-Antwort");
+      setIsProcessing(false);
     }
-    
-    // Weather questions
-    if (lowerInput.includes("wetter")) {
-      return `🌤️ ${selectedAI.name}: Das Wetter wird analysiert... (Für echte Wetterdaten benötige ich eine API-Verbindung)`;
-    }
-    
-    // Time questions
-    if (lowerInput.includes("uhrzeit") || lowerInput.includes("zeit")) {
-      return `⏰ ${selectedAI.name}: Es ist ${new Date().toLocaleTimeString()}`;
-    }
-    
-    // Image/design questions
-    if (lowerInput.includes("bild") || lowerInput.includes("design")) {
-      return `🎨 ${selectedAI.name}: Bildanalyse und Design-Unterstützung werden verarbeitet. Was für ein visuelles Projekt haben Sie im Sinn?`;
-    }
-    
-    // General conversation
-    const responses = [
-      `${selectedAI.name}: Ihre Anfrage wird analysiert. Basierend auf meiner Spezialisierung in ${selectedAI.specialty} kann ich Ihnen dabei helfen.`,
-      `${selectedAI.name}: Verstanden. Ich nutze meine Expertise in ${selectedAI.specialty} für Ihre Anfrage.`,
-      `${selectedAI.name}: Analysiere Ihre Nachricht... Als Spezialist für ${selectedAI.specialty} finde ich die beste Lösung.`,
-      `${selectedAI.name}: Ihre Anfrage wurde empfangen. Mit meinen Fähigkeiten in ${selectedAI.specialty} arbeite ich an der Antwort.`
-    ];
-    
-    return responses[Math.floor(Math.random() * responses.length)];
   };
 
   const handleSend = async () => {
@@ -143,30 +140,12 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    const userInput = input;
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput("");
     setIsProcessing(true);
 
-    // Select best AI for the task
-    const selectedAI = selectBestAI(userInput);
-    
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1500));
-
-    // Generate contextual response
-    const response = generateResponse(userInput, selectedAI);
-
-    const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      content: response,
-      role: "assistant",
-      aiService: selectedAI.name,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, assistantMessage]);
-    setIsProcessing(false);
+    await streamChat(newMessages);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -182,7 +161,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
         <Bot className="w-5 h-5 text-jarvis-primary" />
         <span className="font-semibold jarvis-glow">J.A.R.V.I.S. Chat Interface</span>
         <Badge variant="outline" className="ml-auto border-jarvis-primary/50 text-jarvis-primary">
-          Multi-AI Router
+          🤖 Powered by AI
         </Badge>
       </div>
 
@@ -210,7 +189,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
                     : "bg-secondary border border-border/30"
                 )}
               >
-                <p className="text-sm leading-relaxed">{message.content}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                 <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
                   <span>{message.timestamp.toLocaleTimeString()}</span>
                   {message.aiService && (
@@ -248,7 +227,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-muted-foreground">KI-Router wählt optimale AI aus...</span>
+                  <span className="text-sm text-muted-foreground">J.A.R.V.I.S. denkt nach...</span>
                 </div>
               </div>
             </div>

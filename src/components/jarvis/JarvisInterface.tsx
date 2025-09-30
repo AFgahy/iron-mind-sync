@@ -3,6 +3,7 @@ import { ArcReactor } from "./ArcReactor";
 import { ChatInterface } from "./ChatInterface";
 import { VoiceInput } from "./VoiceInput";
 import { SystemModules } from "./SystemModules";
+import { ImageGenerator } from "./ImageGenerator";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,7 +16,8 @@ import {
   Monitor,
   Smartphone,
   Download,
-  CheckCircle
+  CheckCircle,
+  Image
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePWA } from "@/hooks/usePWA";
@@ -166,7 +168,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       <main className="relative z-10 p-4">
         <div className="max-w-7xl mx-auto">
           <Tabs defaultValue="chat" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-4 bg-background/50 border border-border/30">
+            <TabsList className="grid w-full grid-cols-5 bg-background/50 border border-border/30">
               <TabsTrigger value="chat" className="data-[state=active]:bg-jarvis-primary/20">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Chat
@@ -174,6 +176,10 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               <TabsTrigger value="voice" className="data-[state=active]:bg-jarvis-primary/20">
                 <Mic className="w-4 h-4 mr-2" />
                 Sprache
+              </TabsTrigger>
+              <TabsTrigger value="image" className="data-[state=active]:bg-jarvis-primary/20">
+                <Image className="w-4 h-4 mr-2" />
+                Bilder
               </TabsTrigger>
               <TabsTrigger value="system" className="data-[state=active]:bg-jarvis-primary/20">
                 <Monitor className="w-4 h-4 mr-2" />
@@ -240,6 +246,16 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="image" className="space-y-4">
+              <div className="jarvis-panel p-6">
+                <h3 className="text-lg font-semibold jarvis-glow mb-4 flex items-center gap-2">
+                  <Image className="w-5 h-5" />
+                  Bild-Generator
+                </h3>
+                <ImageGenerator />
               </div>
             </TabsContent>
 

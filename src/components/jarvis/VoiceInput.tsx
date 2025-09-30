@@ -1,145 +1,96 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
-
-// Extend Window interface for Speech APIs
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
+import { toast } from "sonner";
 
 interface VoiceInputProps {
   onVoiceInput?: (text: string) => void;
   className?: string;
 }
 
+const STT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/speech-to-text`;
+
 export const VoiceInput = ({ onVoiceInput, className }: VoiceInputProps) => {
-  const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const recognitionRef = useRef<any>(null);
-  const synthRef = useRef<SpeechSynthesis | null>(null);
-  const { toast } = useToast();
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
-  const startListening = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      toast({
-        title: "Nicht unterstützt",
-        description: "Spracherkennung wird in diesem Browser nicht unterstützt.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'de-DE';
-
-    recognition.onstart = () => {
-      setIsListening(true);
-      toast({
-        title: "Spracherkennung aktiviert",
-        description: "Sprechen Sie jetzt mit J.A.R.V.I.S.",
-      });
-    };
-
-    recognition.onresult = (event) => {
-      let interimTranscript = '';
-      let finalTranscript = '';
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
-        } else {
-          interimTranscript += transcript;
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
         }
-      }
+      });
 
-      setTranscript(finalTranscript + interimTranscript);
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
 
-      if (finalTranscript) {
-        onVoiceInput?.(finalTranscript.trim());
-        
-        // Wake word detection
-        const wakeWords = ['hey jarvis', 'hallo jarvis', 'jarvis'];
-        const lowerTranscript = finalTranscript.toLowerCase();
-        
-        if (wakeWords.some(wake => lowerTranscript.includes(wake))) {
-          speak("Ja, wie kann ich helfen?");
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
         }
-      }
-    };
+      };
 
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      setIsListening(false);
-      toast({
-        title: "Sprachfehler",
-        description: "Es gab ein Problem mit der Spracherkennung.",
-        variant: "destructive"
-      });
-    };
+      mediaRecorder.onstop = async () => {
+        setIsProcessing(true);
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        
+        // Convert to base64
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const base64Audio = (reader.result as string).split(',')[1];
+          
+          try {
+            const response = await fetch(STT_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ audio: base64Audio }),
+            });
 
-    recognition.onend = () => {
-      setIsListening(false);
-    };
+            if (!response.ok) {
+              throw new Error('STT failed');
+            }
 
-    recognitionRef.current = recognition;
-    recognition.start();
-  };
+            const { text } = await response.json();
+            setTranscript(text);
+            onVoiceInput?.(text);
+            toast.success("Transkription erfolgreich!");
+          } catch (error) {
+            console.error('STT error:', error);
+            toast.error("Spracherkennung fehlgeschlagen");
+          } finally {
+            setIsProcessing(false);
+          }
+        };
 
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-      setTranscript("");
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      toast.success("Aufnahme gestartet");
+    } catch (error) {
+      console.error('Mic error:', error);
+      toast.error("Mikrofon-Zugriff fehlgeschlagen");
     }
   };
 
-  const speak = (text: string) => {
-    if (!('speechSynthesis' in window)) {
-      toast({
-        title: "Nicht unterstützt",
-        description: "Sprachausgabe wird in diesem Browser nicht unterstützt.",
-        variant: "destructive"
-      });
-      return;
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
     }
-
-    // Stop any ongoing speech
-    speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'de-DE';
-    utterance.rate = 0.9;
-    utterance.pitch = 1.1;
-    
-    // Try to find a German voice
-    const voices = speechSynthesis.getVoices();
-    const germanVoice = voices.find(voice => voice.lang.startsWith('de'));
-    if (germanVoice) {
-      utterance.voice = germanVoice;
-    }
-
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    speechSynthesis.speak(utterance);
-  };
-
-  const stopSpeaking = () => {
-    speechSynthesis.cancel();
-    setIsSpeaking(false);
   };
 
   return (
@@ -148,41 +99,32 @@ export const VoiceInput = ({ onVoiceInput, className }: VoiceInputProps) => {
         <h3 className="text-lg font-semibold jarvis-glow">Sprach-Interface</h3>
         <div className="flex gap-2">
           <Badge 
-            variant={isListening ? "default" : "secondary"}
-            className={isListening ? "bg-green-500" : ""}
+            variant={isRecording ? "default" : "secondary"}
+            className={isRecording ? "bg-red-500 animate-pulse" : ""}
           >
-            {isListening ? "Aktiv" : "Bereit"}
+            {isRecording ? "🎙️ Aufnahme" : "Bereit"}
           </Badge>
-          <Badge
-            variant={isSpeaking ? "default" : "secondary"} 
-            className={isSpeaking ? "bg-blue-500" : ""}
-          >
-            {isSpeaking ? "Spricht" : "Stumm"}
-          </Badge>
+          {isProcessing && (
+            <Badge variant="default" className="bg-blue-500 animate-pulse">
+              ⚙️ Verarbeitung
+            </Badge>
+          )}
         </div>
       </div>
 
       <div className="flex items-center gap-4 mb-4">
         <Button
-          onClick={isListening ? stopListening : startListening}
-          variant={isListening ? "destructive" : "default"}
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={isProcessing}
+          variant={isRecording ? "destructive" : "default"}
           size="lg"
           className={cn(
-            "relative",
-            isListening && "animate-pulse bg-red-500 hover:bg-red-600"
+            "relative w-full",
+            isRecording && "animate-pulse bg-red-500 hover:bg-red-600"
           )}
         >
-          {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-          {isListening ? "Stoppen" : "Sprechen"}
-        </Button>
-
-        <Button
-          onClick={isSpeaking ? stopSpeaking : () => speak("J.A.R.V.I.S. System bereit.")}
-          variant="outline"
-          className="border-jarvis-primary/50 hover:bg-jarvis-primary/10"
-        >
-          {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          {isSpeaking ? "Stoppen" : "Test"}
+          {isRecording ? <MicOff className="w-5 h-5 mr-2" /> : <Mic className="w-5 h-5 mr-2" />}
+          {isRecording ? "Aufnahme Stoppen" : "Aufnahme Starten"}
         </Button>
       </div>
 
@@ -194,9 +136,10 @@ export const VoiceInput = ({ onVoiceInput, className }: VoiceInputProps) => {
       )}
 
       <div className="mt-4 text-xs text-muted-foreground space-y-1">
-        <p>• Sagen Sie "Hey Jarvis" für Wake-Word Aktivierung</p>
-        <p>• Unterstützt kontinuierliche Spracherkennung</p>
-        <p>• Deutsche Sprachausgabe verfügbar</p>
+        <p>• Powered by OpenAI Whisper</p>
+        <p>• Hochpräzise deutsche Spracherkennung</p>
+        <p>• Klicke auf "Aufnahme Starten" und sprich</p>
+        <p>• Klicke auf "Aufnahme Stoppen" wenn fertig</p>
       </div>
     </div>
   );

@@ -79,7 +79,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
         id: Date.now().toString(),
         content: "",
         role: "assistant",
-        aiService: "J.A.R.V.I.S. AI",
+        aiService: "🧠 AI Router",
         timestamp: new Date()
       }]);
 

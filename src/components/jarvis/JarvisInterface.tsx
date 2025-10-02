@@ -4,6 +4,10 @@ import { ChatInterface } from "./ChatInterface";
 import { VoiceInput } from "./VoiceInput";
 import { SystemModules } from "./SystemModules";
 import { ImageGenerator } from "./ImageGenerator";
+import { ProactiveAssistant } from "./ProactiveAssistant";
+import { CodeGenerator } from "./CodeGenerator";
+import { Calculator } from "./Calculator";
+import { PersonalitySystem } from "./PersonalitySystem";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,7 +21,11 @@ import {
   Smartphone,
   Download,
   CheckCircle,
-  Image
+  Image,
+  Bell,
+  Code2,
+  Calculator as CalcIcon,
+  Heart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePWA } from "@/hooks/usePWA";
@@ -168,7 +176,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       <main className="relative z-10 p-4">
         <div className="max-w-7xl mx-auto">
           <Tabs defaultValue="chat" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-5 bg-background/50 border border-border/30">
+            <TabsList className="grid w-full grid-cols-9 bg-background/50 border border-border/30 overflow-x-auto">
               <TabsTrigger value="chat" className="data-[state=active]:bg-jarvis-primary/20">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Chat
@@ -180,6 +188,22 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               <TabsTrigger value="image" className="data-[state=active]:bg-jarvis-primary/20">
                 <Image className="w-4 h-4 mr-2" />
                 Bilder
+              </TabsTrigger>
+              <TabsTrigger value="code" className="data-[state=active]:bg-jarvis-primary/20">
+                <Code2 className="w-4 h-4 mr-2" />
+                Code
+              </TabsTrigger>
+              <TabsTrigger value="calc" className="data-[state=active]:bg-jarvis-primary/20">
+                <CalcIcon className="w-4 h-4 mr-2" />
+                Rechner
+              </TabsTrigger>
+              <TabsTrigger value="alerts" className="data-[state=active]:bg-jarvis-primary/20">
+                <Bell className="w-4 h-4 mr-2" />
+                Alerts
+              </TabsTrigger>
+              <TabsTrigger value="personality" className="data-[state=active]:bg-jarvis-primary/20">
+                <Heart className="w-4 h-4 mr-2" />
+                Persönlichkeit
               </TabsTrigger>
               <TabsTrigger value="system" className="data-[state=active]:bg-jarvis-primary/20">
                 <Monitor className="w-4 h-4 mr-2" />
@@ -256,6 +280,30 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
                   Bild-Generator
                 </h3>
                 <ImageGenerator />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="code" className="space-y-4">
+              <div className="h-[600px]">
+                <CodeGenerator className="h-full" />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="calc" className="space-y-4">
+              <div className="max-w-2xl mx-auto h-[600px]">
+                <Calculator className="h-full" />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="alerts" className="space-y-4">
+              <div className="max-w-3xl mx-auto h-[600px]">
+                <ProactiveAssistant className="h-full" />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="personality" className="space-y-4">
+              <div className="max-w-3xl mx-auto h-[600px]">
+                <PersonalitySystem className="h-full" />
               </div>
             </TabsContent>
 

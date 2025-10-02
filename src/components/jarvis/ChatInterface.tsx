@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Send, Bot, User, Zap, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useConversations } from "@/hooks/useConversations";
+import { ConversationList } from "./ConversationList";
 
 interface Message {
   id: string;
@@ -23,20 +25,48 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
 const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/text-to-speech`;
 
 export const ChatInterface = ({ className }: ChatInterfaceProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content: "Guten Tag! Ich bin J.A.R.V.I.S. - Just A Rather Very Intelligent System. Wie kann ich Ihnen heute behilflich sein?",
-      role: "assistant",
-      aiService: "J.A.R.V.I.S.",
-      timestamp: new Date()
-    }
-  ]);
+  const {
+    conversations,
+    currentConversation,
+    messages: dbMessages,
+    loading: conversationsLoading,
+    setCurrentConversation,
+    createConversation,
+    deleteConversation,
+    addMessage,
+  } = useConversations();
+
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Sync DB messages with local state
+  useEffect(() => {
+    if (dbMessages.length > 0) {
+      setMessages(
+        dbMessages.map((msg) => ({
+          id: msg.id,
+          content: msg.content,
+          role: msg.role,
+          aiService: msg.ai_model || undefined,
+          timestamp: new Date(msg.created_at),
+        }))
+      );
+    } else {
+      setMessages([
+        {
+          id: "1",
+          content: "Guten Tag! Ich bin J.A.R.V.I.S. - Just A Rather Very Intelligent System. Wie kann ich Ihnen heute behilflich sein?",
+          role: "assistant",
+          aiService: "J.A.R.V.I.S.",
+          timestamp: new Date(),
+        },
+      ]);
+    }
+  }, [dbMessages]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -126,6 +156,11 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
       }
 
       setIsProcessing(false);
+
+      // Save assistant message to DB
+      if (assistantMessage) {
+        await addMessage(assistantMessage, "assistant", "🧠 AI Router");
+      }
     } catch (error) {
       console.error("Chat error:", error);
       toast.error("Fehler beim Abrufen der AI-Antwort");
@@ -142,6 +177,9 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
       role: "user",
       timestamp: new Date()
     };
+
+    // Save user message to DB
+    await addMessage(input, "user");
 
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
@@ -208,7 +246,20 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
   };
 
   return (
-    <div className={cn("jarvis-panel h-full flex flex-col", className)}>
+    <div className="h-full flex gap-4">
+      {/* Conversation List Sidebar */}
+      <div className="w-64 hidden md:block">
+        <ConversationList
+          conversations={conversations}
+          currentConversation={currentConversation}
+          onSelectConversation={setCurrentConversation}
+          onCreateConversation={() => createConversation()}
+          onDeleteConversation={deleteConversation}
+        />
+      </div>
+
+      {/* Chat Interface */}
+      <div className={cn("jarvis-panel flex-1 flex flex-col", className)}>
       <div className="flex items-center gap-2 p-4 border-b border-border/30">
         <Bot className="w-5 h-5 text-jarvis-primary" />
         <span className="font-semibold jarvis-glow">J.A.R.V.I.S. Chat Interface</span>
@@ -321,6 +372,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
             <Send className="w-4 h-4" />
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );

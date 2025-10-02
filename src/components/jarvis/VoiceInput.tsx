@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useWakeWord } from "@/hooks/useWakeWord";
 
 interface VoiceInputProps {
   onVoiceInput?: (text: string) => void;
@@ -16,8 +17,20 @@ export const VoiceInput = ({ onVoiceInput, className }: VoiceInputProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [wakeWordEnabled, setWakeWordEnabled] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+
+  // Wake word detection
+  const { isListening: isWakeWordListening, isSupported: isWakeWordSupported } = useWakeWord({
+    onWakeWordDetected: () => {
+      if (!isRecording) {
+        startRecording();
+      }
+    },
+    wakeWords: ["jarvis", "hey jarvis", "ok jarvis"],
+    enabled: wakeWordEnabled,
+  });
 
   const startRecording = async () => {
     try {
@@ -98,7 +111,25 @@ export const VoiceInput = ({ onVoiceInput, className }: VoiceInputProps) => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold jarvis-glow">Sprach-Interface</h3>
         <div className="flex gap-2">
-          <Badge 
+          {isWakeWordSupported && (
+            <Badge 
+              variant={wakeWordEnabled ? "default" : "secondary"}
+              className={
+                wakeWordEnabled
+                  ? "bg-gradient-jarvis cursor-pointer"
+                  : "cursor-pointer"
+              }
+              onClick={() => setWakeWordEnabled(!wakeWordEnabled)}
+            >
+              {wakeWordEnabled ? "👂 Wake Word: AN" : "Wake Word: AUS"}
+            </Badge>
+          )}
+          {isWakeWordListening && (
+            <Badge variant="outline" className="border-jarvis-primary/50 animate-pulse">
+              🎤 Hört zu...
+            </Badge>
+          )}
+          <Badge
             variant={isRecording ? "default" : "secondary"}
             className={isRecording ? "bg-red-500 animate-pulse" : ""}
           >

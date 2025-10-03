@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Send, Bot, User, Zap, Volume2 } from "lucide-react";
+import { Send, Bot, User, Zap, Volume2, Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
 import { ConversationList } from "./ConversationList";
+import { VoiceInput } from "./VoiceInput";
 
 interface Message {
   id: string;
@@ -40,7 +41,8 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showVoiceInput, setShowVoiceInput] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Sync DB messages with local state
@@ -68,10 +70,9 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
     }
   }, [dbMessages]);
 
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const streamChat = async (chatMessages: Message[]) => {
@@ -196,6 +197,28 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
     }
   };
 
+  const handleVoiceInput = async (text: string) => {
+    setInput(text);
+    setShowVoiceInput(false);
+    // Auto-send after voice input
+    setTimeout(() => {
+      if (text.trim()) {
+        const userMessage: Message = {
+          id: Date.now().toString(),
+          content: text,
+          role: "user",
+          timestamp: new Date()
+        };
+        addMessage(text, "user");
+        const newMessages = [...messages, userMessage];
+        setMessages(newMessages);
+        setInput("");
+        setIsProcessing(true);
+        streamChat(newMessages);
+      }
+    }, 100);
+  };
+
   const speakMessage = async (messageId: string, text: string) => {
     if (playingAudio === messageId) {
       audioRef.current?.pause();
@@ -268,7 +291,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
         </Badge>
       </div>
 
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message) => (
             <div
@@ -350,29 +373,54 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 
-      <div className="p-4 border-t border-border/30">
-        <div className="flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Fragen Sie J.A.R.V.I.S. etwas..."
-            className="flex-1 bg-background/50 border-jarvis-primary/30 focus:border-jarvis-primary"
-            disabled={isProcessing}
+      {showVoiceInput ? (
+        <div className="p-4 border-t border-border/30">
+          <VoiceInput 
+            onVoiceInput={handleVoiceInput}
+            className="mb-0"
           />
           <Button
-            onClick={handleSend}
-            disabled={!input.trim() || isProcessing}
-            size="icon"
-            className="bg-gradient-jarvis hover:opacity-90"
+            variant="outline"
+            className="w-full mt-2"
+            onClick={() => setShowVoiceInput(false)}
           >
-            <Send className="w-4 h-4" />
+            Zurück zum Text-Chat
           </Button>
         </div>
-      </div>
+      ) : (
+        <div className="p-4 border-t border-border/30">
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowVoiceInput(true)}
+              size="icon"
+              variant="outline"
+              className="border-jarvis-primary/30 hover:border-jarvis-primary"
+            >
+              <Mic className="w-4 h-4" />
+            </Button>
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Fragen Sie J.A.R.V.I.S. etwas..."
+              className="flex-1 bg-background/50 border-jarvis-primary/30 focus:border-jarvis-primary"
+              disabled={isProcessing}
+            />
+            <Button
+              onClick={handleSend}
+              disabled={!input.trim() || isProcessing}
+              size="icon"
+              className="bg-gradient-jarvis hover:opacity-90"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

@@ -100,6 +100,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_context: {
+        Row: {
+          category: string
+          confidence_score: number | null
+          context_key: string
+          context_value: Json
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          confidence_score?: number | null
+          context_key: string
+          context_value: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          confidence_score?: number | null
+          context_key?: string
+          context_value?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

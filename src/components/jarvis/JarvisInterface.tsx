@@ -8,6 +8,8 @@ import { ProactiveAssistant } from "./ProactiveAssistant";
 import { CodeGenerator } from "./CodeGenerator";
 import { Calculator } from "./Calculator";
 import { PersonalitySystem } from "./PersonalitySystem";
+import { PluginSystem } from "./PluginSystem";
+import { LearningSystem } from "./LearningSystem";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,7 +27,9 @@ import {
   Bell,
   Code2,
   Calculator as CalcIcon,
-  Heart
+  Heart,
+  Puzzle,
+  Brain
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePWA } from "@/hooks/usePWA";
@@ -176,41 +180,49 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       <main className="relative z-10 p-4">
         <div className="max-w-7xl mx-auto">
           <Tabs defaultValue="chat" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-9 bg-background/50 border border-border/30 overflow-x-auto">
+            <TabsList className="grid w-full grid-cols-11 bg-background/50 border border-border/30 overflow-x-auto text-xs">
               <TabsTrigger value="chat" className="data-[state=active]:bg-jarvis-primary/20">
-                <MessageSquare className="w-4 h-4 mr-2" />
+                <MessageSquare className="w-4 h-4 mr-1" />
                 Chat
               </TabsTrigger>
               <TabsTrigger value="voice" className="data-[state=active]:bg-jarvis-primary/20">
-                <Mic className="w-4 h-4 mr-2" />
-                Sprache
+                <Mic className="w-4 h-4 mr-1" />
+                Voice
               </TabsTrigger>
               <TabsTrigger value="image" className="data-[state=active]:bg-jarvis-primary/20">
-                <Image className="w-4 h-4 mr-2" />
+                <Image className="w-4 h-4 mr-1" />
                 Bilder
               </TabsTrigger>
               <TabsTrigger value="code" className="data-[state=active]:bg-jarvis-primary/20">
-                <Code2 className="w-4 h-4 mr-2" />
+                <Code2 className="w-4 h-4 mr-1" />
                 Code
               </TabsTrigger>
               <TabsTrigger value="calc" className="data-[state=active]:bg-jarvis-primary/20">
-                <CalcIcon className="w-4 h-4 mr-2" />
-                Rechner
+                <CalcIcon className="w-4 h-4 mr-1" />
+                Calc
               </TabsTrigger>
               <TabsTrigger value="alerts" className="data-[state=active]:bg-jarvis-primary/20">
-                <Bell className="w-4 h-4 mr-2" />
+                <Bell className="w-4 h-4 mr-1" />
                 Alerts
               </TabsTrigger>
               <TabsTrigger value="personality" className="data-[state=active]:bg-jarvis-primary/20">
-                <Heart className="w-4 h-4 mr-2" />
-                Persönlichkeit
+                <Heart className="w-4 h-4 mr-1" />
+                Mood
+              </TabsTrigger>
+              <TabsTrigger value="plugins" className="data-[state=active]:bg-jarvis-primary/20">
+                <Puzzle className="w-4 h-4 mr-1" />
+                Plugins
+              </TabsTrigger>
+              <TabsTrigger value="learning" className="data-[state=active]:bg-jarvis-primary/20">
+                <Brain className="w-4 h-4 mr-1" />
+                Learn
               </TabsTrigger>
               <TabsTrigger value="system" className="data-[state=active]:bg-jarvis-primary/20">
-                <Monitor className="w-4 h-4 mr-2" />
+                <Monitor className="w-4 h-4 mr-1" />
                 System
               </TabsTrigger>
               <TabsTrigger value="mobile" className="data-[state=active]:bg-jarvis-primary/20">
-                <Smartphone className="w-4 h-4 mr-2" />
+                <Smartphone className="w-4 h-4 mr-1" />
                 Mobile
               </TabsTrigger>
             </TabsList>
@@ -304,6 +316,18 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
             <TabsContent value="personality" className="space-y-4">
               <div className="max-w-3xl mx-auto h-[600px]">
                 <PersonalitySystem className="h-full" />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="plugins" className="space-y-4">
+              <div className="max-w-3xl mx-auto h-[600px]">
+                <PluginSystem className="h-full" />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="learning" className="space-y-4">
+              <div className="max-w-3xl mx-auto h-[600px]">
+                <LearningSystem className="h-full" />
               </div>
             </TabsContent>
 

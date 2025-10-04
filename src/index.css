@@ -174,3 +174,28 @@ All colors MUST be HSL.
   color: hsl(200 100% 60%);
   text-shadow: 0 0 10px hsl(200 100% 60% / 0.8);
 }
+
+/* Force scrollbar to be visible */
+[data-radix-scroll-area-viewport] {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary) / 0.5) hsl(var(--muted) / 0.3);
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  width: 12px;
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar-track {
+  background: hsl(var(--muted) / 0.3);
+  border-radius: 10px;
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.5);
+  border-radius: 10px;
+  border: 2px solid hsl(var(--muted) / 0.3);
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.7);
+}

@@ -42,7 +42,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
   const [showVoiceInput, setShowVoiceInput] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Sync DB messages with local state
@@ -72,7 +72,12 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollAreaRef.current) {
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (viewport) {
+        viewport.scrollTop = viewport.scrollHeight;
+      }
+    }
   }, [messages]);
 
   const streamChat = async (chatMessages: Message[]) => {
@@ -291,8 +296,8 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
         </Badge>
       </div>
 
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
+      <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
+        <div className="space-y-4 pb-4">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -373,7 +378,6 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
               </div>
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 

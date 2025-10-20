@@ -11,7 +11,7 @@ interface VoiceInputProps {
   className?: string;
 }
 
-const STT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/speech-to-text`;
+const STT_URL = `https://swegtvnkvmonsvrwenvu.supabase.co/functions/v1/speech-to-text`;
 
 export const VoiceInput = ({ onVoiceInput, className }: VoiceInputProps) => {
   const [isRecording, setIsRecording] = useState(false);

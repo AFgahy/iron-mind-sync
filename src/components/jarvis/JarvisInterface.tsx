@@ -13,6 +13,7 @@ import { LearningSystem } from "./LearningSystem";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import { 
   MessageSquare, 
   Mic, 
@@ -42,7 +43,14 @@ interface JarvisInterfaceProps {
 export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
   const [isSystemActive, setIsSystemActive] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeTab, setActiveTab] = useState("chat");
   const { isInstallable, isInstalled, installPWA, browserInfo } = usePWA();
+  
+  const { processCommand } = useVoiceCommands({
+    onOpenTab: (tabValue: string) => {
+      setActiveTab(tabValue);
+    }
+  });
 
   // Update time every second
   useEffect(() => {
@@ -54,7 +62,15 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
 
   const handleVoiceInput = (text: string) => {
     console.log("Voice input received:", text);
-    // Here you would integrate with the chat interface
+    
+    // Versuche, den Text als Befehl zu verarbeiten
+    const wasCommand = processCommand(text);
+    
+    // Wenn es kein Befehl war, zeige den Text im Chat an
+    if (!wasCommand) {
+      setActiveTab("chat");
+      // Der Text wird vom VoiceInput direkt an ChatInterface weitergegeben
+    }
   };
 
   const handleInstallApp = async () => {
@@ -179,7 +195,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       {/* Main Content */}
       <main className="relative z-10 p-4">
         <div className="max-w-7xl mx-auto">
-          <Tabs defaultValue="chat" className="space-y-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
             <TabsList className="grid w-full grid-cols-11 bg-background/50 border border-border/30 overflow-x-auto text-xs">
               <TabsTrigger value="chat" className="data-[state=active]:bg-jarvis-primary/20">
                 <MessageSquare className="w-4 h-4 mr-1" />
@@ -269,16 +285,28 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
                       <span className="text-jarvis-primary">Wake Word</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">"Öffne YouTube"</span>
-                      <span className="text-jarvis-primary">App starten</span>
+                      <span className="text-muted-foreground">"Öffne Chat"</span>
+                      <span className="text-jarvis-primary">Chat öffnen</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">"Wie ist das Wetter?"</span>
-                      <span className="text-jarvis-primary">Information</span>
+                      <span className="text-muted-foreground">"Öffne Rechner"</span>
+                      <span className="text-jarvis-primary">Rechner öffnen</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">"Berechne 15 * 23"</span>
-                      <span className="text-jarvis-primary">Mathematik</span>
+                      <span className="text-muted-foreground">"Bild Generator"</span>
+                      <span className="text-jarvis-primary">Bilder generieren</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">"Code Generator"</span>
+                      <span className="text-jarvis-primary">Code erstellen</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">"Zeige System"</span>
+                      <span className="text-jarvis-primary">System Status</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">"Öffne Plugins"</span>
+                      <span className="text-jarvis-primary">Plugins anzeigen</span>
                     </div>
                   </div>
                 </div>

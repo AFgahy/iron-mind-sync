@@ -1,24 +1,38 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { JarvisInterface } from "@/components/jarvis/JarvisInterface";
-import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { LogOut, User } from "lucide-react";
+import { WelcomeSequence } from "@/components/jarvis/WelcomeSequence";
 
 const Index = () => {
-  const { user, loading, signOut, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeComplete, setWelcomeComplete] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      navigate("/auth");
+      navigate('/auth');
+    } else if (user && !welcomeComplete) {
+      const hasSeenWelcome = sessionStorage.getItem('welcomeShown');
+      if (!hasSeenWelcome) {
+        setShowWelcome(true);
+        sessionStorage.setItem('welcomeShown', 'true');
+      } else {
+        setWelcomeComplete(true);
+      }
     }
-  }, [loading, isAuthenticated, navigate]);
+  }, [user, loading, isAuthenticated, navigate, welcomeComplete]);
+
+  const handleWelcomeComplete = () => {
+    setShowWelcome(false);
+    setWelcomeComplete(true);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-jarvis-dark">
-        <div className="text-jarvis-primary animate-pulse">Lade J.A.R.V.I.S...</div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-jarvis-primary animate-pulse text-lg">Initializing J.A.R.V.I.S...</div>
       </div>
     );
   }
@@ -27,23 +41,16 @@ const Index = () => {
     return null;
   }
 
+  if (showWelcome) {
+    const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Sir';
+    return <WelcomeSequence userName={displayName} onComplete={handleWelcomeComplete} />;
+  }
+
   return (
-    <div className="relative">
-      <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/50 backdrop-blur-sm border border-jarvis-primary/30">
-          <User className="w-4 h-4 text-jarvis-primary" />
-          <span className="text-sm text-muted-foreground">{user?.email}</span>
-        </div>
-        <Button
-          onClick={signOut}
-          variant="outline"
-          size="icon"
-          className="border-jarvis-primary/30 hover:border-jarvis-primary hover:bg-jarvis-primary/10"
-        >
-          <LogOut className="w-4 h-4" />
-        </Button>
+    <div className="min-h-screen bg-black text-foreground overflow-hidden">
+      <div className="container mx-auto p-4 h-screen">
+        <JarvisInterface />
       </div>
-      <JarvisInterface />
     </div>
   );
 };

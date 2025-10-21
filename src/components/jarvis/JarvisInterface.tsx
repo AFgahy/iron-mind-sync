@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { ArcReactor } from "./ArcReactor";
 import { ChatInterface } from "./ChatInterface";
 import { VoiceInput } from "./VoiceInput";
@@ -10,6 +11,7 @@ import { Calculator } from "./Calculator";
 import { PersonalitySystem } from "./PersonalitySystem";
 import { PluginSystem } from "./PluginSystem";
 import { LearningSystem } from "./LearningSystem";
+import { UserMenu } from "./UserMenu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -180,14 +182,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </Badge>
             </div>
 
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setIsSystemActive(!isSystemActive)}
-              className="border-jarvis-primary/50 hover:bg-jarvis-primary/10"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
+            <UserMenu />
           </div>
         </div>
       </header>

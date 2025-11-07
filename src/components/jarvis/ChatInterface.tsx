@@ -273,7 +273,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
   return (
     <div className="h-full flex gap-4">
       {/* Conversation List Sidebar */}
-      <div className="w-64 hidden md:block">
+      <div className="w-64 hidden md:block h-full">
         <ConversationList
           conversations={conversations}
           currentConversation={currentConversation}
@@ -284,8 +284,8 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
       </div>
 
       {/* Chat Interface */}
-      <div className={cn("jarvis-panel flex-1 flex flex-col", className)}>
-      <div className="flex items-center gap-2 p-4 border-b border-border/30">
+      <div className={cn("jarvis-panel flex-1 flex flex-col h-full overflow-hidden", className)}>
+      <div className="flex items-center gap-2 p-4 border-b border-border/30 flex-shrink-0">
         <Bot className="w-5 h-5 text-jarvis-primary" />
         <span className="font-semibold jarvis-glow">J.A.R.V.I.S. Chat Interface</span>
         <Badge variant="outline" className="ml-auto border-jarvis-primary/50 text-jarvis-primary">
@@ -293,8 +293,8 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
         </Badge>
       </div>
 
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4 pb-4">
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="space-y-4 p-4 pb-4">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -380,7 +380,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
       </ScrollArea>
 
       {showVoiceInput ? (
-        <div className="p-4 border-t border-border/30">
+        <div className="p-4 border-t border-border/30 flex-shrink-0">
           <VoiceInput 
             onVoiceInput={handleVoiceInput}
             className="mb-0"
@@ -394,7 +394,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
           </Button>
         </div>
       ) : (
-        <div className="p-4 border-t border-border/30">
+        <div className="p-4 border-t border-border/30 flex-shrink-0">
           <div className="flex gap-2">
             <Button
               onClick={() => setShowVoiceInput(true)}

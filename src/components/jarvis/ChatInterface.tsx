@@ -284,17 +284,18 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
       </div>
 
       {/* Chat Interface */}
-      <div className={cn("jarvis-panel flex-1 flex flex-col h-full overflow-hidden", className)}>
-      <div className="flex items-center gap-2 p-4 border-b border-border/30 flex-shrink-0">
-        <Bot className="w-5 h-5 text-jarvis-primary" />
-        <span className="font-semibold jarvis-glow">J.A.R.V.I.S. Chat Interface</span>
-        <Badge variant="outline" className="ml-auto border-jarvis-primary/50 text-jarvis-primary">
-          🤖 Powered by AI
-        </Badge>
-      </div>
+      <div className={cn("jarvis-panel flex-1 flex flex-col h-full", className)}>
+        {/* Header */}
+        <div className="flex items-center gap-2 p-4 border-b border-border/30 flex-shrink-0">
+          <Bot className="w-5 h-5 text-jarvis-primary" />
+          <span className="font-semibold jarvis-glow">J.A.R.V.I.S. Chat Interface</span>
+          <Badge variant="outline" className="ml-auto border-jarvis-primary/50 text-jarvis-primary">
+            🤖 Powered by AI
+          </Badge>
+        </div>
 
-      <ScrollArea className="flex-1 min-h-0">
-        <div className="space-y-4 p-4 pb-4">
+        {/* Messages Area - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ minHeight: 0 }}>
           {messages.map((message) => (
             <div
               key={message.id}
@@ -377,52 +378,53 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
           )}
           <div ref={messagesEndRef} />
         </div>
-      </ScrollArea>
 
-      {showVoiceInput ? (
-        <div className="p-4 border-t border-border/30 flex-shrink-0">
-          <VoiceInput 
-            onVoiceInput={handleVoiceInput}
-            className="mb-0"
-          />
-          <Button
-            variant="outline"
-            className="w-full mt-2"
-            onClick={() => setShowVoiceInput(false)}
-          >
-            Zurück zum Text-Chat
-          </Button>
-        </div>
-      ) : (
-        <div className="p-4 border-t border-border/30 flex-shrink-0">
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setShowVoiceInput(true)}
-              size="icon"
-              variant="outline"
-              className="border-jarvis-primary/30 hover:border-jarvis-primary"
-            >
-              <Mic className="w-4 h-4" />
-            </Button>
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Fragen Sie J.A.R.V.I.S. etwas..."
-              className="flex-1 bg-background/50 border-jarvis-primary/30 focus:border-jarvis-primary"
-              disabled={isProcessing}
+        {/* Input Area - Fixed at bottom */}
+
+        {showVoiceInput ? (
+          <div className="p-4 border-t border-border/30 flex-shrink-0">
+            <VoiceInput 
+              onVoiceInput={handleVoiceInput}
+              className="mb-0"
             />
             <Button
-              onClick={handleSend}
-              disabled={!input.trim() || isProcessing}
-              size="icon"
-              className="bg-gradient-jarvis hover:opacity-90"
+              variant="outline"
+              className="w-full mt-2"
+              onClick={() => setShowVoiceInput(false)}
             >
-              <Send className="w-4 h-4" />
+              Zurück zum Text-Chat
             </Button>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="p-4 border-t border-border/30 flex-shrink-0">
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setShowVoiceInput(true)}
+                size="icon"
+                variant="outline"
+                className="border-jarvis-primary/30 hover:border-jarvis-primary"
+              >
+                <Mic className="w-4 h-4" />
+              </Button>
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Fragen Sie J.A.R.V.I.S. etwas..."
+                className="flex-1 bg-background/50 border-jarvis-primary/30 focus:border-jarvis-primary"
+                disabled={isProcessing}
+              />
+              <Button
+                onClick={handleSend}
+                disabled={!input.trim() || isProcessing}
+                size="icon"
+                className="bg-gradient-jarvis hover:opacity-90"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

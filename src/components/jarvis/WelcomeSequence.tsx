@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArcReactor } from "./ArcReactor";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,12 @@ export const WelcomeSequence = ({ userName = "Sir", onComplete }: WelcomeSequenc
   const [fadeOut, setFadeOut] = useState(false);
   const [progress, setProgress] = useState(0);
   const fullText = `Welcome home, ${userName}.`;
+  const onCompleteRef = useRef(onComplete);
+  
+  // Update ref when onComplete changes
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -20,7 +26,6 @@ export const WelcomeSequence = ({ userName = "Sir", onComplete }: WelcomeSequenc
 
     if (phase === 0) {
       // Phase 0: Arc Reactor erscheint mit Scan (2.5s)
-      setProgress(0);
       const startTime = Date.now();
       interval = setInterval(() => {
         const elapsed = Date.now() - startTime;
@@ -68,7 +73,7 @@ export const WelcomeSequence = ({ userName = "Sir", onComplete }: WelcomeSequenc
       // Phase 3: Fade out transition (1s)
       setFadeOut(true);
       timer = setTimeout(() => {
-        onComplete();
+        onCompleteRef.current();
       }, 1000);
     }
 
@@ -76,7 +81,7 @@ export const WelcomeSequence = ({ userName = "Sir", onComplete }: WelcomeSequenc
       if (timer) clearTimeout(timer);
       if (interval) clearInterval(interval);
     };
-  }, [phase, fullText, onComplete]);
+  }, [phase, fullText]);
 
   return (
     <div className={cn(

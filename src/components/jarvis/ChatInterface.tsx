@@ -271,9 +271,9 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
   };
 
   return (
-    <div className="h-full flex gap-4">
+    <div className="h-full flex gap-4 overflow-hidden">
       {/* Conversation List Sidebar */}
-      <div className="w-64 hidden md:block h-full">
+      <div className="w-64 hidden md:block h-full overflow-hidden">
         <ConversationList
           conversations={conversations}
           currentConversation={currentConversation}
@@ -284,7 +284,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
       </div>
 
       {/* Chat Interface */}
-      <div className={cn("jarvis-panel flex-1 flex flex-col h-full", className)}>
+      <div className={cn("jarvis-panel flex-1 flex flex-col overflow-hidden", className)}>
         {/* Header */}
         <div className="flex items-center gap-2 p-4 border-b border-border/30 flex-shrink-0">
           <Bot className="w-5 h-5 text-jarvis-primary" />
@@ -295,7 +295,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
         </div>
 
         {/* Messages Area - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ minHeight: 0 }}>
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((message) => (
             <div
               key={message.id}

@@ -14,8 +14,8 @@ serve(async (req) => {
   try {
     const { prompt, image } = await req.json();
 
-    if (!prompt) {
-      throw new Error('Prompt is required');
+    if (!prompt || !image) {
+      throw new Error('Prompt and image are required');
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -23,23 +23,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
-    // Build content array - if image provided, include it for editing
-    const content: any[] = [
-      {
-        type: "text",
-        text: prompt
-      }
-    ];
-
-    if (image) {
-      content.push({
-        type: "image_url",
-        image_url: {
-          url: image
-        }
-      });
-    }
-
+    // Use Lovable AI with image editing capabilities
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -51,7 +35,18 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: content
+            content: [
+              {
+                type: "text",
+                text: prompt
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: image
+                }
+              }
+            ]
           }
         ],
         modalities: ["image", "text"]
@@ -61,7 +56,7 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("AI Gateway error:", response.status, errorText);
-      throw new Error("Image generation failed");
+      throw new Error("Image editing failed");
     }
 
     const data = await response.json();

@@ -26,6 +26,9 @@ export const Whiteboard = () => {
   const [resizingBox, setResizingBox] = useState<string | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [toolbarPos, setToolbarPos] = useState({ x: 16, y: 16 });
+  const [isDraggingToolbar, setIsDraggingToolbar] = useState(false);
+  const [toolbarDragStart, setToolbarDragStart] = useState({ x: 0, y: 0 });
 
   const colors = ['#00d4ff', '#ffffff', '#ff0000', '#00ff00', '#ffff00', '#ff00ff', '#ffa500'];
 
@@ -140,7 +143,7 @@ export const Whiteboard = () => {
 
       const { data, error } = await supabase.functions.invoke('generate-image', {
         body: { 
-          prompt: 'Verbessere diese Zeichnung, behalte aber das ursprüngliche Motiv und die Form bei. Mache die Linien klarer und die Farben lebendiger.',
+          prompt: 'Mache aus dieser Skizze eine detaillierte, realistische Version. Behalte das Hauptmotiv bei aber verbessere die Details, Proportionen und mache es fotorealistisch.',
           image: dataUrl 
         }
       });
@@ -177,7 +180,12 @@ export const Whiteboard = () => {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (draggedBox) {
+    if (isDraggingToolbar) {
+      const dx = e.clientX - toolbarDragStart.x;
+      const dy = e.clientY - toolbarDragStart.y;
+      setToolbarPos({ x: toolbarPos.x + dx, y: toolbarPos.y + dy });
+      setToolbarDragStart({ x: e.clientX, y: e.clientY });
+    } else if (draggedBox) {
       const dx = e.clientX - dragStart.x;
       const dy = e.clientY - dragStart.y;
 
@@ -203,6 +211,7 @@ export const Whiteboard = () => {
   const handleMouseUp = () => {
     setDraggedBox(null);
     setResizingBox(null);
+    setIsDraggingToolbar(false);
   };
 
   const deleteBox = (boxId: string) => {
@@ -216,7 +225,14 @@ export const Whiteboard = () => {
       onMouseUp={handleMouseUp}
     >
       {/* Toolbar */}
-      <Card className="absolute top-4 left-4 z-10 p-3 bg-background/95 backdrop-blur space-y-3">
+      <Card 
+        className="absolute z-10 p-3 bg-background/95 backdrop-blur space-y-3 cursor-move select-none"
+        style={{ left: toolbarPos.x, top: toolbarPos.y }}
+        onMouseDown={(e) => {
+          setIsDraggingToolbar(true);
+          setToolbarDragStart({ x: e.clientX, y: e.clientY });
+        }}
+      >
         <div className="flex gap-2">
           <Button
             size="icon"

@@ -139,7 +139,10 @@ export const Whiteboard = () => {
       const dataUrl = canvas.toDataURL('image/png');
 
       const { data, error } = await supabase.functions.invoke('generate-image', {
-        body: { prompt: `Improve and enhance this drawing while keeping its essence: ${dataUrl}` }
+        body: { 
+          prompt: 'Verbessere diese Zeichnung, behalte aber das ursprüngliche Motiv und die Form bei. Mache die Linien klarer und die Farben lebendiger.',
+          image: dataUrl 
+        }
       });
 
       if (error) throw error;

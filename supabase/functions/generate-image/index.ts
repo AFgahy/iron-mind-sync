@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt } = await req.json();
+    const { prompt, image } = await req.json();
 
     if (!prompt) {
       throw new Error('Prompt is required');
@@ -21,6 +21,23 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY not configured");
+    }
+
+    // Build content array - if image provided, include it for editing
+    const content: any[] = [
+      {
+        type: "text",
+        text: prompt
+      }
+    ];
+
+    if (image) {
+      content.push({
+        type: "image_url",
+        image_url: {
+          url: image
+        }
+      });
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -34,7 +51,7 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: prompt
+            content: content
           }
         ],
         modalities: ["image", "text"]

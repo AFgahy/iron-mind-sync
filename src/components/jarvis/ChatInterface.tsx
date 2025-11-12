@@ -284,7 +284,7 @@ export const ChatInterface = ({ className }: ChatInterfaceProps) => {
       </div>
 
       {/* Chat Interface */}
-      <div className={cn("jarvis-panel flex-1 flex flex-col h-full", className)}>
+      <div className={cn("jarvis-panel flex-1 flex flex-col max-h-[600px]", className)}>
         {/* Header */}
         <div className="flex items-center gap-2 p-4 border-b border-border/30 flex-shrink-0">
           <Bot className="w-5 h-5 text-jarvis-primary" />

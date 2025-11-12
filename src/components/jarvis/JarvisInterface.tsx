@@ -12,6 +12,7 @@ import { PersonalitySystem } from "./PersonalitySystem";
 import { PluginSystem } from "./PluginSystem";
 import { LearningSystem } from "./LearningSystem";
 import { UserMenu } from "./UserMenu";
+import { Whiteboard } from "./Whiteboard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,7 +33,8 @@ import {
   Calculator as CalcIcon,
   Heart,
   Puzzle,
-  Brain
+  Brain,
+  PenTool
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePWA } from "@/hooks/usePWA";
@@ -191,7 +193,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       <main className="relative z-10 p-4">
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid w-full grid-cols-11 bg-background/50 border border-border/30 overflow-x-auto text-xs">
+            <TabsList className="grid w-full grid-cols-12 bg-background/50 border border-border/30 overflow-x-auto text-xs">
               <TabsTrigger value="chat" className="data-[state=active]:bg-jarvis-primary/20">
                 <MessageSquare className="w-4 h-4 mr-1" />
                 Chat
@@ -199,6 +201,10 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               <TabsTrigger value="voice" className="data-[state=active]:bg-jarvis-primary/20">
                 <Mic className="w-4 h-4 mr-1" />
                 Voice
+              </TabsTrigger>
+              <TabsTrigger value="whiteboard" className="data-[state=active]:bg-jarvis-primary/20">
+                <PenTool className="w-4 h-4 mr-1" />
+                Board
               </TabsTrigger>
               <TabsTrigger value="image" className="data-[state=active]:bg-jarvis-primary/20">
                 <Image className="w-4 h-4 mr-1" />
@@ -305,6 +311,12 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="whiteboard" className="space-y-4" style={{ height: 'calc(100vh - 200px)' }}>
+              <div className="h-full">
+                <Whiteboard />
               </div>
             </TabsContent>
 

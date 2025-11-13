@@ -64,6 +64,24 @@ export const Whiteboard = () => {
     ctx.moveTo(x, y);
   };
 
+  const startDrawingTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    setIsDrawing(true);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
 
@@ -76,6 +94,29 @@ export const Whiteboard = () => {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = tool === 'eraser' ? '#000000' : color;
+    ctx.lineWidth = tool === 'eraser' ? lineWidth * 3 : lineWidth;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+  };
+
+  const drawTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    if (!isDrawing) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
 
     ctx.lineTo(x, y);
     ctx.strokeStyle = tool === 'eraser' ? '#000000' : color;
@@ -208,7 +249,43 @@ export const Whiteboard = () => {
     }
   };
 
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (isDraggingToolbar) {
+      const dx = touch.clientX - toolbarDragStart.x;
+      const dy = touch.clientY - toolbarDragStart.y;
+      setToolbarPos({ x: toolbarPos.x + dx, y: toolbarPos.y + dy });
+      setToolbarDragStart({ x: touch.clientX, y: touch.clientY });
+    } else if (draggedBox) {
+      const dx = touch.clientX - dragStart.x;
+      const dy = touch.clientY - dragStart.y;
+
+      setAIBoxes(prev => prev.map(box => 
+        box.id === draggedBox 
+          ? { ...box, x: box.x + dx, y: box.y + dy }
+          : box
+      ));
+      setDragStart({ x: touch.clientX, y: touch.clientY });
+    } else if (resizingBox) {
+      const dx = touch.clientX - dragStart.x;
+      const dy = touch.clientY - dragStart.y;
+
+      setAIBoxes(prev => prev.map(box => 
+        box.id === resizingBox 
+          ? { ...box, width: Math.max(200, box.width + dx), height: Math.max(150, box.height + dy) }
+          : box
+      ));
+      setDragStart({ x: touch.clientX, y: touch.clientY });
+    }
+  };
+
   const handleMouseUp = () => {
+    setDraggedBox(null);
+    setResizingBox(null);
+    setIsDraggingToolbar(false);
+  };
+
+  const handleTouchEnd = () => {
     setDraggedBox(null);
     setResizingBox(null);
     setIsDraggingToolbar(false);
@@ -223,14 +300,21 @@ export const Whiteboard = () => {
       className="relative w-full h-full"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Toolbar */}
       <Card 
-        className="absolute z-10 p-3 bg-background/95 backdrop-blur space-y-3 cursor-move select-none"
+        className="absolute z-10 p-3 bg-background/95 backdrop-blur space-y-3 cursor-move select-none touch-none"
         style={{ left: toolbarPos.x, top: toolbarPos.y }}
         onMouseDown={(e) => {
           setIsDraggingToolbar(true);
           setToolbarDragStart({ x: e.clientX, y: e.clientY });
+        }}
+        onTouchStart={(e) => {
+          const touch = e.touches[0];
+          setIsDraggingToolbar(true);
+          setToolbarDragStart({ x: touch.clientX, y: touch.clientY });
         }}
       >
         <div className="flex gap-2">
@@ -311,11 +395,14 @@ export const Whiteboard = () => {
       {/* Canvas */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full cursor-crosshair"
+        className="w-full h-full cursor-crosshair touch-none"
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
+        onTouchStart={startDrawingTouch}
+        onTouchMove={drawTouch}
+        onTouchEnd={stopDrawing}
       />
 
       {/* AI Response Boxes */}

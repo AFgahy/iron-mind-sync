@@ -193,54 +193,54 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       <main className="relative z-10 p-4">
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid w-full grid-cols-12 bg-background/50 border border-border/30 overflow-x-auto text-xs">
-              <TabsTrigger value="chat" className="data-[state=active]:bg-jarvis-primary/20">
-                <MessageSquare className="w-4 h-4 mr-1" />
-                Chat
+            <TabsList className="flex md:grid w-full md:grid-cols-12 bg-background/50 border border-border/30 overflow-x-auto text-xs scrollbar-hide gap-1 md:gap-0 p-1">
+              <TabsTrigger value="chat" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <MessageSquare className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Chat</span>
               </TabsTrigger>
-              <TabsTrigger value="voice" className="data-[state=active]:bg-jarvis-primary/20">
-                <Mic className="w-4 h-4 mr-1" />
-                Voice
+              <TabsTrigger value="voice" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <Mic className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Voice</span>
               </TabsTrigger>
-              <TabsTrigger value="whiteboard" className="data-[state=active]:bg-jarvis-primary/20">
-                <PenTool className="w-4 h-4 mr-1" />
-                Board
+              <TabsTrigger value="whiteboard" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <PenTool className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Board</span>
               </TabsTrigger>
-              <TabsTrigger value="image" className="data-[state=active]:bg-jarvis-primary/20">
-                <Image className="w-4 h-4 mr-1" />
-                Bilder
+              <TabsTrigger value="image" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <Image className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Bilder</span>
               </TabsTrigger>
-              <TabsTrigger value="code" className="data-[state=active]:bg-jarvis-primary/20">
-                <Code2 className="w-4 h-4 mr-1" />
-                Code
+              <TabsTrigger value="code" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <Code2 className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Code</span>
               </TabsTrigger>
-              <TabsTrigger value="calc" className="data-[state=active]:bg-jarvis-primary/20">
-                <CalcIcon className="w-4 h-4 mr-1" />
-                Calc
+              <TabsTrigger value="calc" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <CalcIcon className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Calc</span>
               </TabsTrigger>
-              <TabsTrigger value="alerts" className="data-[state=active]:bg-jarvis-primary/20">
-                <Bell className="w-4 h-4 mr-1" />
-                Alerts
+              <TabsTrigger value="alerts" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <Bell className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Alerts</span>
               </TabsTrigger>
-              <TabsTrigger value="personality" className="data-[state=active]:bg-jarvis-primary/20">
-                <Heart className="w-4 h-4 mr-1" />
-                Mood
+              <TabsTrigger value="personality" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <Heart className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Mood</span>
               </TabsTrigger>
-              <TabsTrigger value="plugins" className="data-[state=active]:bg-jarvis-primary/20">
-                <Puzzle className="w-4 h-4 mr-1" />
-                Plugins
+              <TabsTrigger value="plugins" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <Puzzle className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Plugins</span>
               </TabsTrigger>
-              <TabsTrigger value="learning" className="data-[state=active]:bg-jarvis-primary/20">
-                <Brain className="w-4 h-4 mr-1" />
-                Learn
+              <TabsTrigger value="learning" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <Brain className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Learn</span>
               </TabsTrigger>
-              <TabsTrigger value="system" className="data-[state=active]:bg-jarvis-primary/20">
-                <Monitor className="w-4 h-4 mr-1" />
-                System
+              <TabsTrigger value="system" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <Monitor className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">System</span>
               </TabsTrigger>
-              <TabsTrigger value="mobile" className="data-[state=active]:bg-jarvis-primary/20">
-                <Smartphone className="w-4 h-4 mr-1" />
-                Mobile
+              <TabsTrigger value="mobile" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0">
+                <Smartphone className="w-4 h-4 md:mr-1" />
+                <span className="hidden md:inline">Mobile</span>
               </TabsTrigger>
             </TabsList>
 

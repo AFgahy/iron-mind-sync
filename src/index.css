@@ -199,3 +199,13 @@ All colors MUST be HSL.
 [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--primary) / 0.7);
 }
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

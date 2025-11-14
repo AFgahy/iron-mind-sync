@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Card } from '@/components/ui/card';
-import { Eraser, Pencil, Sparkles, ImagePlus } from 'lucide-react';
+import { Eraser, Pencil, Sparkles, ImagePlus, Move, ZoomIn, ZoomOut } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -19,6 +19,7 @@ export const Whiteboard = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [tool, setTool] = useState<'pen' | 'eraser'>('pen');
+  const [mode, setMode] = useState<'draw' | 'move'>('draw');
   const [color, setColor] = useState('#00d4ff');
   const [lineWidth, setLineWidth] = useState(3);
   const [aiBoxes, setAIBoxes] = useState<AIBox[]>([]);
@@ -29,6 +30,11 @@ export const Whiteboard = () => {
   const [toolbarPos, setToolbarPos] = useState({ x: 16, y: 16 });
   const [isDraggingToolbar, setIsDraggingToolbar] = useState(false);
   const [toolbarDragStart, setToolbarDragStart] = useState({ x: 0, y: 0 });
+  const [scale, setScale] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [lastTouchDistance, setLastTouchDistance] = useState<number | null>(null);
 
   const colors = ['#00d4ff', '#ffffff', '#ff0000', '#00ff00', '#ffff00', '#ff00ff', '#ffa500'];
 
@@ -53,8 +59,14 @@ export const Whiteboard = () => {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = (e.clientX - rect.left - offset.x) / scale;
+    const y = (e.clientY - rect.top - offset.y) / scale;
+
+    if (mode === 'move') {
+      setIsPanning(true);
+      setPanStart({ x: e.clientX, y: e.clientY });
+      return;
+    }
 
     setIsDrawing(true);
     const ctx = canvas.getContext('2d');
@@ -69,10 +81,28 @@ export const Whiteboard = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    if (e.touches.length === 2) {
+      // Pinch to zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      );
+      setLastTouchDistance(distance);
+      return;
+    }
+
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    const x = (touch.clientX - rect.left - offset.x) / scale;
+    const y = (touch.clientY - rect.top - offset.y) / scale;
+
+    if (mode === 'move') {
+      setIsPanning(true);
+      setPanStart({ x: touch.clientX, y: touch.clientY });
+      return;
+    }
 
     setIsDrawing(true);
     const ctx = canvas.getContext('2d');
@@ -83,17 +113,25 @@ export const Whiteboard = () => {
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left - offset.x) / scale;
+    const y = (e.clientY - rect.top - offset.y) / scale;
+
+    if (isPanning && mode === 'move') {
+      const dx = e.clientX - panStart.x;
+      const dy = e.clientY - panStart.y;
+      setOffset({ x: offset.x + dx, y: offset.y + dy });
+      setPanStart({ x: e.clientX, y: e.clientY });
+      return;
+    }
+
+    if (!isDrawing) return;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
 
     ctx.lineTo(x, y);
     ctx.strokeStyle = tool === 'eraser' ? '#000000' : color;
@@ -105,18 +143,42 @@ export const Whiteboard = () => {
 
   const drawTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
-    if (!isDrawing) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (e.touches.length === 2 && lastTouchDistance !== null) {
+      // Pinch to zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      );
+      
+      const delta = distance - lastTouchDistance;
+      const newScale = Math.max(0.5, Math.min(3, scale + delta * 0.01));
+      setScale(newScale);
+      setLastTouchDistance(distance);
+      return;
+    }
 
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    const x = (touch.clientX - rect.left - offset.x) / scale;
+    const y = (touch.clientY - rect.top - offset.y) / scale;
+
+    if (isPanning && mode === 'move') {
+      const dx = touch.clientX - panStart.x;
+      const dy = touch.clientY - panStart.y;
+      setOffset({ x: offset.x + dx, y: offset.y + dy });
+      setPanStart({ x: touch.clientX, y: touch.clientY });
+      return;
+    }
+
+    if (!isDrawing) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
     ctx.lineTo(x, y);
     ctx.strokeStyle = tool === 'eraser' ? '#000000' : color;
@@ -128,6 +190,8 @@ export const Whiteboard = () => {
 
   const stopDrawing = () => {
     setIsDrawing(false);
+    setIsPanning(false);
+    setLastTouchDistance(null);
   };
 
   const clearCanvas = () => {
@@ -295,6 +359,19 @@ export const Whiteboard = () => {
     setAIBoxes(prev => prev.filter(box => box.id !== boxId));
   };
 
+  const handleZoomIn = () => {
+    setScale(prev => Math.min(3, prev + 0.2));
+  };
+
+  const handleZoomOut = () => {
+    setScale(prev => Math.max(0.5, prev - 0.2));
+  };
+
+  const handleResetView = () => {
+    setScale(1);
+    setOffset({ x: 0, y: 0 });
+  };
+
   return (
     <div 
       className="relative w-full h-full"
@@ -317,48 +394,109 @@ export const Whiteboard = () => {
           setToolbarDragStart({ x: touch.clientX, y: touch.clientY });
         }}
       >
-        <div className="flex gap-2">
-          <Button
-            size="icon"
-            variant={tool === 'pen' ? 'default' : 'outline'}
-            onClick={() => setTool('pen')}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant={tool === 'eraser' ? 'default' : 'outline'}
-            onClick={() => setTool('eraser')}
-          >
-            <Eraser className="h-4 w-4" />
-          </Button>
-        </div>
-
         <div className="space-y-2">
-          <div className="text-xs text-muted-foreground">Farbe</div>
-          <div className="flex gap-1 flex-wrap max-w-[120px]">
-            {colors.map(c => (
-              <button
-                key={c}
-                className={`w-6 h-6 rounded border-2 ${color === c ? 'border-primary' : 'border-border'}`}
-                style={{ backgroundColor: c }}
-                onClick={() => setColor(c)}
-              />
-            ))}
+          <div className="text-xs text-muted-foreground">Modus</div>
+          <div className="flex gap-2">
+            <Button
+              size="icon"
+              variant={mode === 'draw' ? 'default' : 'outline'}
+              onClick={() => setMode('draw')}
+              title="Zeichnen"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant={mode === 'move' ? 'default' : 'outline'}
+              onClick={() => setMode('move')}
+              title="Bewegen"
+            >
+              <Move className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <div className="text-xs text-muted-foreground">Größe</div>
-          <Slider
-            value={[lineWidth]}
-            onValueChange={([v]) => setLineWidth(v)}
-            min={1}
-            max={20}
-            step={1}
-            className="w-24"
-          />
-        </div>
+        {mode === 'draw' && (
+          <>
+            <div className="flex gap-2">
+              <Button
+                size="icon"
+                variant={tool === 'pen' ? 'default' : 'outline'}
+                onClick={() => setTool('pen')}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant={tool === 'eraser' ? 'default' : 'outline'}
+                onClick={() => setTool('eraser')}
+              >
+                <Eraser className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-xs text-muted-foreground">Farbe</div>
+              <div className="flex gap-1 flex-wrap max-w-[120px]">
+                {colors.map(c => (
+                  <button
+                    key={c}
+                    className={`w-6 h-6 rounded border-2 ${color === c ? 'border-primary' : 'border-border'}`}
+                    style={{ backgroundColor: c }}
+                    onClick={() => setColor(c)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-xs text-muted-foreground">Größe</div>
+              <Slider
+                value={[lineWidth]}
+                onValueChange={([v]) => setLineWidth(v)}
+                min={1}
+                max={20}
+                step={1}
+                className="w-24"
+              />
+            </div>
+          </>
+        )}
+
+        {mode === 'move' && (
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground">Zoom</div>
+            <div className="flex gap-2">
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={handleZoomOut}
+                title="Rauszoomen"
+              >
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={handleZoomIn}
+                title="Reinzoomen"
+              >
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleResetView}
+              className="w-full"
+            >
+              Zurücksetzen
+            </Button>
+            <div className="text-xs text-center text-muted-foreground">
+              {Math.round(scale * 100)}%
+            </div>
+          </div>
+        )}
 
         <div className="space-y-2">
           <Button
@@ -395,7 +533,12 @@ export const Whiteboard = () => {
       {/* Canvas */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full cursor-crosshair touch-none"
+        className="w-full h-full touch-none"
+        style={{
+          cursor: mode === 'move' ? 'grab' : 'crosshair',
+          transform: `scale(${scale}) translate(${offset.x / scale}px, ${offset.y / scale}px)`,
+          transformOrigin: 'top left'
+        }}
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}

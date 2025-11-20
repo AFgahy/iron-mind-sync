@@ -11,6 +11,7 @@ import { Calculator } from "./Calculator";
 import { PersonalitySystem } from "./PersonalitySystem";
 import { PluginSystem } from "./PluginSystem";
 import { LearningSystem } from "./LearningSystem";
+import { SecuritySystem } from "./SecuritySystem";
 import { UserMenu } from "./UserMenu";
 import { Whiteboard } from "./Whiteboard";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,9 @@ import {
   Heart,
   Puzzle,
   Brain,
-  PenTool
+  PenTool,
+  BookOpen,
+  Edit3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePWA } from "@/hooks/usePWA";
@@ -218,6 +221,10 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
                 <CalcIcon className="w-5 h-5 md:w-4 md:h-4 md:mr-1" />
                 <span className="hidden md:inline">Calc</span>
               </TabsTrigger>
+              <TabsTrigger value="security" className="data-[state=active]:bg-destructive/20 flex-shrink-0 px-4 md:px-3">
+                <Shield className="w-5 h-5 md:w-4 md:h-4 md:mr-1" />
+                <span className="hidden md:inline">Security</span>
+              </TabsTrigger>
               <TabsTrigger value="alerts" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0 px-4 md:px-3">
                 <Bell className="w-5 h-5 md:w-4 md:h-4 md:mr-1" />
                 <span className="hidden md:inline">Alerts</span>
@@ -339,6 +346,12 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
             <TabsContent value="calc" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
               <div className="max-w-2xl mx-auto h-[600px]">
                 <Calculator className="h-full" />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="security" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+              <div className="max-w-3xl mx-auto h-[600px]">
+                <SecuritySystem className="h-full" />
               </div>
             </TabsContent>
 

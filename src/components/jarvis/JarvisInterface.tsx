@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { ArcReactor } from "./ArcReactor";
 import { ChatInterface } from "./ChatInterface";
 import { VoiceInput } from "./VoiceInput";
@@ -14,6 +15,7 @@ import { LearningSystem } from "./LearningSystem";
 import { SecuritySystem } from "./SecuritySystem";
 import { UserMenu } from "./UserMenu";
 import { Whiteboard } from "./Whiteboard";
+import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -52,6 +54,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeTab, setActiveTab] = useState("chat");
   const { isInstallable, isInstalled, installPWA, browserInfo } = usePWA();
+  const { theme } = useTheme();
   
   const { processCommand } = useVoiceCommands({
     onOpenTab: (tabValue: string) => {
@@ -187,6 +190,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </Badge>
             </div>
 
+            <ThemeSwitcher />
             <UserMenu />
           </div>
         </div>

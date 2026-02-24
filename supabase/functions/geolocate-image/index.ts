@@ -103,12 +103,14 @@ Antworte IMMER im folgenden JSON-Format (kein Markdown, nur reines JSON):
   "location_name": "Name des Ortes",
   "country": "Land",
   "city": "Stadt/Region",
+  "street": "Straßenname (falls erkennbar)",
+  "house_number": "Hausnummer (falls erkennbar)",
   "description": "Detaillierte Erklärung, warum du diesen Standort vermutest",
   "clues": ["Hinweis 1", "Hinweis 2", "Hinweis 3"],
   "nearby_landmarks": ["Wahrzeichen 1", "Wahrzeichen 2"]
 }
 
-Wenn du den Standort nicht identifizieren kannst, setze "found" auf false und erkläre warum.`
+Wenn du den Standort nicht identifizieren kannst, setze "found" auf false und erkläre warum. Versuche immer so genau wie möglich zu sein – identifiziere Straßennamen und Hausnummern wenn möglich anhand von Schildern, Gebäuden oder sonstigen Hinweisen.`
           },
           {
             role: "user",
@@ -161,6 +163,8 @@ Wenn du den Standort nicht identifizieren kannst, setze "found" auf false und er
         location_name: "Unbekannt",
         country: "Unbekannt",
         city: "Unbekannt",
+        street: "",
+        house_number: "",
         description: content,
         clues: [],
         nearby_landmarks: []

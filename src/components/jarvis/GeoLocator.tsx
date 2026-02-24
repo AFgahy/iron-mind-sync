@@ -24,6 +24,8 @@ interface LocationResult {
   location_name: string;
   country: string;
   city: string;
+  street: string;
+  house_number: string;
   description: string;
   clues: string[];
   nearby_landmarks: string[];
@@ -143,10 +145,10 @@ export const GeoLocator = ({ className }: GeoLocatorProps) => {
           </div>
         </Card>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-4 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
           {/* Image Preview + Controls */}
-          <Card className="jarvis-panel p-4 flex flex-col gap-3 lg:w-1/2">
-            <div className="relative rounded-md overflow-hidden flex-1 min-h-[200px]">
+          <Card className="jarvis-panel p-4 flex flex-col gap-3">
+            <div className="relative rounded-md overflow-hidden flex-1 min-h-[250px]">
               <img
                 src={imagePreview}
                 alt="Hochgeladenes Bild"
@@ -176,7 +178,7 @@ export const GeoLocator = ({ className }: GeoLocatorProps) => {
           </Card>
 
           {/* Results */}
-          <Card className="jarvis-panel p-4 flex flex-col gap-3 lg:w-1/2 overflow-y-auto">
+          <Card className="jarvis-panel p-4 flex flex-col gap-3 overflow-y-auto">
             {!result ? (
               <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
                 <MapPin className="w-5 h-5 mr-2 opacity-50" /> Klicke auf "Standort erkennen" um zu starten
@@ -199,6 +201,10 @@ export const GeoLocator = ({ className }: GeoLocatorProps) => {
                     {/* Location Info */}
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="jarvis-panel p-2 rounded">
+                        <span className="text-muted-foreground">Straße</span>
+                        <p className="font-medium">{result.street || "–"}{result.house_number ? ` ${result.house_number}` : ""}</p>
+                      </div>
+                      <div className="jarvis-panel p-2 rounded">
                         <span className="text-muted-foreground">Stadt</span>
                         <p className="font-medium">{result.city}</p>
                       </div>
@@ -207,12 +213,8 @@ export const GeoLocator = ({ className }: GeoLocatorProps) => {
                         <p className="font-medium">{result.country}</p>
                       </div>
                       <div className="jarvis-panel p-2 rounded">
-                        <span className="text-muted-foreground">Breitengrad</span>
-                        <p className="font-mono text-xs">{result.latitude.toFixed(6)}</p>
-                      </div>
-                      <div className="jarvis-panel p-2 rounded">
-                        <span className="text-muted-foreground">Längengrad</span>
-                        <p className="font-mono text-xs">{result.longitude.toFixed(6)}</p>
+                        <span className="text-muted-foreground">Koordinaten</span>
+                        <p className="font-mono text-xs">{result.latitude.toFixed(6)}, {result.longitude.toFixed(6)}</p>
                       </div>
                     </div>
 

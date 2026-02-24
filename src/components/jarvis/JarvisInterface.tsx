@@ -15,6 +15,7 @@ import { LearningSystem } from "./LearningSystem";
 import { SecuritySystem } from "./SecuritySystem";
 import { UserMenu } from "./UserMenu";
 import { Whiteboard } from "./Whiteboard";
+import { GeoLocator } from "./GeoLocator";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +40,8 @@ import {
   Brain,
   PenTool,
   BookOpen,
-  Edit3
+  Edit3,
+  MapPin
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePWA } from "@/hooks/usePWA";
@@ -200,7 +202,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       <main className="relative z-10 p-4">
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="flex md:grid w-full md:grid-cols-12 bg-background/50 border border-border/30 overflow-x-auto text-xs scrollbar-hide gap-2 md:gap-0 p-2">
+            <TabsList className="flex md:grid w-full md:grid-cols-14 bg-background/50 border border-border/30 overflow-x-auto text-xs scrollbar-hide gap-2 md:gap-0 p-2">
               <TabsTrigger value="chat" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0 px-4 md:px-3">
                 <MessageSquare className="w-5 h-5 md:w-4 md:h-4 md:mr-1" />
                 <span className="hidden md:inline">Chat</span>
@@ -248,6 +250,10 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               <TabsTrigger value="system" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0 px-4 md:px-3">
                 <Monitor className="w-5 h-5 md:w-4 md:h-4 md:mr-1" />
                 <span className="hidden md:inline">System</span>
+              </TabsTrigger>
+              <TabsTrigger value="geo" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0 px-4 md:px-3">
+                <MapPin className="w-5 h-5 md:w-4 md:h-4 md:mr-1" />
+                <span className="hidden md:inline">GeoSpy</span>
               </TabsTrigger>
               <TabsTrigger value="mobile" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0 px-4 md:px-3">
                 <Smartphone className="w-5 h-5 md:w-4 md:h-4 md:mr-1" />
@@ -385,6 +391,10 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
 
             <TabsContent value="system" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
               <SystemModules />
+            </TabsContent>
+
+            <TabsContent value="geo" className="space-y-4 h-[calc(100vh-320px)] md:h-[calc(100vh-250px)]">
+              <GeoLocator className="h-full" />
             </TabsContent>
 
             <TabsContent value="mobile" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">

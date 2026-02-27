@@ -109,11 +109,11 @@ export const GeoLocator = ({ className }: GeoLocatorProps) => {
   };
 
   return (
-    <div className={cn("flex flex-col gap-4 h-full", className)}>
+    <div className={cn("flex flex-col gap-4 h-full overflow-y-auto", className)}>
       {/* Upload Area */}
       {!imagePreview ? (
-        <Card className="jarvis-panel flex-1 flex flex-col items-center justify-center gap-6 p-8">
-          <Globe className="w-16 h-16 text-primary opacity-60" />
+        <Card className="jarvis-panel flex-1 flex flex-col items-center justify-center gap-4 md:gap-6 p-6 md:p-8">
+          <Globe className="w-12 h-12 md:w-16 md:h-16 text-primary opacity-60" />
           <div className="text-center">
             <h3 className="text-lg font-semibold mb-1">GeoLocator</h3>
             <p className="text-sm text-muted-foreground">
@@ -137,18 +137,18 @@ export const GeoLocator = ({ className }: GeoLocatorProps) => {
               onChange={handleFileSelect}
             />
             <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="gap-2">
-              <Upload className="w-4 h-4" /> Foto hochladen
+              <Upload className="w-4 h-4" /> Hochladen
             </Button>
             <Button onClick={() => cameraInputRef.current?.click()} variant="outline" className="gap-2">
-              <Camera className="w-4 h-4" /> Foto aufnehmen
+              <Camera className="w-4 h-4" /> Aufnehmen
             </Button>
           </div>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 flex-1 min-h-0">
           {/* Image Preview + Controls */}
-          <Card className="jarvis-panel p-4 flex flex-col gap-3">
-            <div className="relative rounded-md overflow-hidden flex-1 min-h-[250px]">
+          <Card className="jarvis-panel p-3 md:p-4 flex flex-col gap-3">
+            <div className="relative rounded-md overflow-hidden h-[200px] md:h-[280px] lg:flex-1 lg:min-h-[250px]">
               <img
                 src={imagePreview}
                 alt="Hochgeladenes Bild"
@@ -178,53 +178,49 @@ export const GeoLocator = ({ className }: GeoLocatorProps) => {
           </Card>
 
           {/* Results */}
-          <Card className="jarvis-panel p-4 flex flex-col gap-3 overflow-y-auto">
+          <Card className="jarvis-panel p-3 md:p-4 flex flex-col gap-3 overflow-y-auto">
             {!result ? (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-                <MapPin className="w-5 h-5 mr-2 opacity-50" /> Klicke auf "Standort erkennen" um zu starten
+              <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm py-6">
+                <MapPin className="w-5 h-5 mr-2 opacity-50" /> Klicke auf "Standort erkennen"
               </div>
             ) : (
               <>
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <Navigation className="w-5 h-5 text-primary" />
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <h3 className="font-semibold text-base md:text-lg flex items-center gap-2">
+                    <Navigation className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                     {result.found ? result.location_name : "Nicht erkannt"}
                   </h3>
                   <Badge variant="outline" className={confidenceColor(result.confidence)}>
-                    {result.confidence === "high" ? "Hohe" : result.confidence === "medium" ? "Mittlere" : "Niedrige"} Sicherheit
+                    {result.confidence === "high" ? "Hoch" : result.confidence === "medium" ? "Mittel" : "Niedrig"}
                   </Badge>
                 </div>
 
                 {result.found && (
                   <>
-                    {/* Location Info */}
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="jarvis-panel p-2 rounded">
-                        <span className="text-muted-foreground">Straße</span>
-                        <p className="font-medium">{result.street || "–"}{result.house_number ? ` ${result.house_number}` : ""}</p>
+                        <span className="text-muted-foreground text-xs">Straße</span>
+                        <p className="font-medium text-sm">{result.street || "–"}{result.house_number ? ` ${result.house_number}` : ""}</p>
                       </div>
                       <div className="jarvis-panel p-2 rounded">
-                        <span className="text-muted-foreground">Stadt</span>
-                        <p className="font-medium">{result.city}</p>
+                        <span className="text-muted-foreground text-xs">Stadt</span>
+                        <p className="font-medium text-sm">{result.city}</p>
                       </div>
                       <div className="jarvis-panel p-2 rounded">
-                        <span className="text-muted-foreground">Land</span>
-                        <p className="font-medium">{result.country}</p>
+                        <span className="text-muted-foreground text-xs">Land</span>
+                        <p className="font-medium text-sm">{result.country}</p>
                       </div>
                       <div className="jarvis-panel p-2 rounded">
-                        <span className="text-muted-foreground">Koordinaten</span>
-                        <p className="font-mono text-xs">{result.latitude.toFixed(6)}, {result.longitude.toFixed(6)}</p>
+                        <span className="text-muted-foreground text-xs">Koordinaten</span>
+                        <p className="font-mono text-xs">{result.latitude.toFixed(4)}, {result.longitude.toFixed(4)}</p>
                       </div>
                     </div>
 
-                    {/* Map Button */}
-                    <Button onClick={openInMaps} variant="outline" className="gap-2">
+                    <Button onClick={openInMaps} variant="outline" size="sm" className="gap-2">
                       <ExternalLink className="w-4 h-4" /> In Google Maps öffnen
                     </Button>
 
-                    {/* Map Embed */}
-                    <div className="rounded-md overflow-hidden border border-border/30 h-[200px]">
+                    <div className="rounded-md overflow-hidden border border-border/30 h-[150px] md:h-[200px]">
                       <iframe
                         title="Standort"
                         width="100%"
@@ -237,16 +233,14 @@ export const GeoLocator = ({ className }: GeoLocatorProps) => {
                   </>
                 )}
 
-                {/* Description */}
                 <div>
                   <h4 className="text-sm font-semibold mb-1">Analyse</h4>
-                  <p className="text-sm text-muted-foreground">{result.description}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">{result.description}</p>
                 </div>
 
-                {/* Clues */}
                 {result.clues?.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold mb-1">Erkannte Hinweise</h4>
+                    <h4 className="text-sm font-semibold mb-1">Hinweise</h4>
                     <div className="flex flex-wrap gap-1">
                       {result.clues.map((c, i) => (
                         <Badge key={i} variant="secondary" className="text-xs">{c}</Badge>
@@ -255,11 +249,10 @@ export const GeoLocator = ({ className }: GeoLocatorProps) => {
                   </div>
                 )}
 
-                {/* Landmarks */}
                 {result.nearby_landmarks?.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold mb-1">Nahegelegene Wahrzeichen</h4>
-                    <ul className="text-sm text-muted-foreground space-y-1">
+                    <h4 className="text-sm font-semibold mb-1">Wahrzeichen</h4>
+                    <ul className="text-xs md:text-sm text-muted-foreground space-y-1">
                       {result.nearby_landmarks.map((l, i) => (
                         <li key={i} className="flex items-center gap-1">
                           <MapPin className="w-3 h-3 text-primary" /> {l}

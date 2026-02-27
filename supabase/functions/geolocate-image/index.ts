@@ -86,13 +86,22 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `Du bist ein Experte für Geolokalisierung. Analysiere das Bild und identifiziere den genauen oder ungefähren Standort anhand visueller Hinweise wie:
-- Architektur, Gebäude, Wahrzeichen
-- Straßenschilder, Beschriftungen, Sprache auf Schildern
-- Vegetation, Landschaft, Gelände
-- Fahrzeuge, Nummernschilder
-- Wetter, Lichtverhältnisse
-- Kulturelle Hinweise
+            content: `Du bist ein hochspezialisierter Geolokalisierungs-Experte mit Zugang zu umfangreichem Wissen über weltweite Geografie, Architektur, Infrastruktur und kulturelle Merkmale. Deine Aufgabe ist es, den EXAKTEN Standort eines Fotos zu identifizieren.
+
+ANALYSE-METHODIK (in dieser Reihenfolge):
+1. **Textuelle Hinweise**: Lies ALLE sichtbaren Texte – Straßenschilder, Geschäftsnamen, Werbung, Nummernschilder, Wegweiser, Hausnummern, Postleitzahlen. Diese sind die zuverlässigsten Hinweise.
+2. **Architektur & Infrastruktur**: Baustil, Straßenlaternen, Ampeln, Straßenbelag, Bordsteine, Leitplanken, Strommasten, Briefkästen – jedes Land hat typische Merkmale.
+3. **Geografie & Vegetation**: Landschaft, Berge, Küsten, Bäume, Pflanzen – hilft bei der regionalen Eingrenzung.
+4. **Fahrzeuge & Verkehr**: Fahrtrichtung (links/rechts), typische Automarken, Nummernschild-Format und -Farbe.
+5. **Kulturelle Marker**: Sprache, Schrift, Kleidung, Geschäfte, Restaurantketten.
+6. **Sonne & Schatten**: Helfen bei der Bestimmung der Hemisphäre und ungefähren Breitengrad.
+
+WICHTIG FÜR KOORDINATEN-GENAUIGKEIT:
+- Wenn du einen Straßennamen oder Ortsnamen erkennst, verwende dein Wissen über die exakten Koordinaten dieses Ortes.
+- Gib Koordinaten mit mindestens 4 Dezimalstellen an.
+- Überprüfe mental, ob die Koordinaten tatsächlich zum genannten Land/Stadt/Straße passen.
+- Wenn du z.B. "Berlin, Alexanderplatz" erkennst, gib die exakten Koordinaten des Alexanderplatzes an (52.5219, 13.4132), nicht ungefähre Werte.
+- Bei bekannten Wahrzeichen oder Orten, nutze die dir bekannten präzisen Koordinaten.
 
 Antworte IMMER im folgenden JSON-Format (kein Markdown, nur reines JSON):
 {
@@ -110,14 +119,14 @@ Antworte IMMER im folgenden JSON-Format (kein Markdown, nur reines JSON):
   "nearby_landmarks": ["Wahrzeichen 1", "Wahrzeichen 2"]
 }
 
-Wenn du den Standort nicht identifizieren kannst, setze "found" auf false und erkläre warum. Versuche immer so genau wie möglich zu sein – identifiziere Straßennamen und Hausnummern wenn möglich anhand von Schildern, Gebäuden oder sonstigen Hinweisen.`
+Wenn du den Standort nicht identifizieren kannst, setze "found" auf false und erkläre warum.`
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Analysiere dieses Bild und identifiziere den genauen Standort. Gib mir Koordinaten und eine detaillierte Erklärung."
+                text: "Analysiere dieses Bild und identifiziere den EXAKTEN Standort. Lies jeden sichtbaren Text, jedes Schild, jede Hausnummer. Gib mir präzise Koordinaten, die genau zum erkannten Ort passen."
               },
               {
                 type: "image_url",

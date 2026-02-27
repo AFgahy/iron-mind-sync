@@ -159,29 +159,29 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 jarvis-panel mx-4 mt-4 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <header className="relative z-10 jarvis-panel mx-2 md:mx-4 mt-2 md:mt-4 p-2 md:p-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-4 min-w-0">
             <ArcReactor size="sm" isActive={isSystemActive} />
-            <div>
-              <h1 className="text-2xl font-bold jarvis-glow">J.A.R.V.I.S.</h1>
-              <p className="text-sm text-muted-foreground">
+            <div className="min-w-0">
+              <h1 className="text-lg md:text-2xl font-bold jarvis-glow truncate">J.A.R.V.I.S.</h1>
+              <p className="text-xs text-muted-foreground hidden md:block">
                 Just A Rather Very Intelligent System
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4 shrink-0">
             <div className="text-right">
-              <p className="text-sm font-mono text-jarvis-primary">
+              <p className="text-xs md:text-sm font-mono text-jarvis-primary">
                 {currentTime.toLocaleTimeString()}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground hidden md:block">
                 {currentTime.toLocaleDateString()}
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2">
               <Badge variant="outline" className="border-green-400/50 text-green-400">
                 <Shield className="w-3 h-3 mr-1" />
                 SECURE
@@ -199,10 +199,10 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 p-4">
+      <main className="relative z-10 p-2 md:p-4">
         <div className="max-w-7xl mx-auto">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="flex md:grid w-full md:grid-cols-14 bg-background/50 border border-border/30 overflow-x-auto text-xs scrollbar-hide gap-2 md:gap-0 p-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 md:space-y-4">
+            <TabsList className="flex md:grid w-full md:grid-cols-14 bg-background/50 border border-border/30 overflow-x-auto text-xs scrollbar-hide gap-1 md:gap-0 p-1.5 md:p-2">
               <TabsTrigger value="chat" className="data-[state=active]:bg-jarvis-primary/20 flex-shrink-0 px-4 md:px-3">
                 <MessageSquare className="w-5 h-5 md:w-4 md:h-4 md:mr-1" />
                 <span className="hidden md:inline">Chat</span>
@@ -261,8 +261,8 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="chat" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-320px)] md:h-[calc(100vh-250px)]">
+            <TabsContent value="chat" className="space-y-2 md:space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-200px)] md:h-[calc(100vh-220px)]">
                 <div className="lg:col-span-2 h-full">
                   <ChatInterface className="h-full" />
                 </div>
@@ -292,7 +292,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </div>
             </TabsContent>
 
-            <TabsContent value="voice" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="voice" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <VoiceInput onVoiceInput={handleVoiceInput} />
                 <div className="jarvis-panel p-6">
@@ -331,13 +331,13 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </div>
             </TabsContent>
 
-            <TabsContent value="whiteboard" className="space-y-4 h-[calc(100vh-300px)] md:h-[calc(100vh-200px)]">
+            <TabsContent value="whiteboard" className="space-y-4 h-[calc(100vh-180px)] md:h-[calc(100vh-200px)]">
               <div className="h-full">
                 <Whiteboard />
               </div>
             </TabsContent>
 
-            <TabsContent value="image" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="image" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="jarvis-panel p-6">
                 <h3 className="text-lg font-semibold jarvis-glow mb-4 flex items-center gap-2">
                   <Image className="w-5 h-5" />
@@ -347,57 +347,57 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </div>
             </TabsContent>
 
-            <TabsContent value="code" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="code" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="h-[600px]">
                 <CodeGenerator className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="calc" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="calc" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="max-w-2xl mx-auto h-[600px]">
                 <Calculator className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="security" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="security" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="max-w-3xl mx-auto h-[600px]">
                 <SecuritySystem className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="alerts" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="alerts" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="max-w-3xl mx-auto h-[600px]">
                 <ProactiveAssistant className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="personality" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="personality" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="max-w-3xl mx-auto h-[600px]">
                 <PersonalitySystem className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="plugins" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="plugins" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="max-w-3xl mx-auto h-[600px]">
                 <PluginSystem className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="learning" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="learning" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="max-w-3xl mx-auto h-[600px]">
                 <LearningSystem className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="system" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="system" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <SystemModules />
             </TabsContent>
 
-            <TabsContent value="geo" className="space-y-4 h-[calc(100vh-320px)] md:h-[calc(100vh-250px)]">
+            <TabsContent value="geo" className="space-y-4 h-[calc(100vh-180px)] md:h-[calc(100vh-200px)]">
               <GeoLocator className="h-full" />
             </TabsContent>
 
-            <TabsContent value="mobile" className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-250px)]">
+            <TabsContent value="mobile" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
               <div className="jarvis-panel p-6 text-center">
                 <Smartphone className="w-16 h-16 mx-auto mb-4 text-jarvis-primary" />
                 <h3 className="text-xl font-semibold jarvis-glow mb-2">Mobile Integration</h3>

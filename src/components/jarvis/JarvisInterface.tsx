@@ -262,7 +262,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
             </TabsList>
 
             <TabsContent value="chat" className="space-y-2 md:space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-200px)] md:h-[calc(100vh-220px)]">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-180px)]">
                 <div className="lg:col-span-2 h-full">
                   <ChatInterface className="h-full" />
                 </div>

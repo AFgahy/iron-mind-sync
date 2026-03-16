@@ -389,7 +389,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </div>
             </TabsContent>
 
-            <TabsContent value="system" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
+            <TabsContent value="system" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
               <SystemModules />
             </TabsContent>
 

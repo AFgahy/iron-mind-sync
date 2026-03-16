@@ -347,44 +347,44 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </div>
             </TabsContent>
 
-            <TabsContent value="code" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
-              <div className="h-[600px]">
+            <TabsContent value="code" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+              <div className="h-[calc(100vh-220px)]">
                 <CodeGenerator className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="calc" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
-              <div className="max-w-2xl mx-auto h-[600px]">
+            <TabsContent value="calc" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+              <div className="max-w-2xl mx-auto h-[calc(100vh-220px)]">
                 <Calculator className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="security" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
-              <div className="max-w-3xl mx-auto h-[600px]">
+            <TabsContent value="security" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+              <div className="max-w-3xl mx-auto h-[calc(100vh-220px)]">
                 <SecuritySystem className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="alerts" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
-              <div className="max-w-3xl mx-auto h-[600px]">
+            <TabsContent value="alerts" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+              <div className="max-w-3xl mx-auto h-[calc(100vh-220px)]">
                 <ProactiveAssistant className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="personality" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
-              <div className="max-w-3xl mx-auto h-[600px]">
+            <TabsContent value="personality" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+              <div className="max-w-3xl mx-auto h-[calc(100vh-220px)]">
                 <PersonalitySystem className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="plugins" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
-              <div className="max-w-3xl mx-auto h-[600px]">
+            <TabsContent value="plugins" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+              <div className="max-w-3xl mx-auto h-[calc(100vh-220px)]">
                 <PluginSystem className="h-full" />
               </div>
             </TabsContent>
 
-            <TabsContent value="learning" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
-              <div className="max-w-3xl mx-auto h-[600px]">
+            <TabsContent value="learning" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+              <div className="max-w-3xl mx-auto h-[calc(100vh-220px)]">
                 <LearningSystem className="h-full" />
               </div>
             </TabsContent>

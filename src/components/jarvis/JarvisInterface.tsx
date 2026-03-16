@@ -397,7 +397,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               <GeoLocator className="h-full" />
             </TabsContent>
 
-            <TabsContent value="mobile" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
+            <TabsContent value="mobile" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
               <div className="jarvis-panel p-6 text-center">
                 <Smartphone className="w-16 h-16 mx-auto mb-4 text-jarvis-primary" />
                 <h3 className="text-xl font-semibold jarvis-glow mb-2">Mobile Integration</h3>

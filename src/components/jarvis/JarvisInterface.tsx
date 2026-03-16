@@ -393,7 +393,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               <SystemModules />
             </TabsContent>
 
-            <TabsContent value="geo" className="space-y-4 h-[calc(100vh-180px)] md:h-[calc(100vh-200px)]">
+            <TabsContent value="geo" className="space-y-4 h-[calc(100vh-180px)]">
               <GeoLocator className="h-full" />
             </TabsContent>
 

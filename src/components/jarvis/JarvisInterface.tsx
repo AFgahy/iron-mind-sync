@@ -331,7 +331,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </div>
             </TabsContent>
 
-            <TabsContent value="whiteboard" className="space-y-4 h-[calc(100vh-180px)] md:h-[calc(100vh-200px)]">
+            <TabsContent value="whiteboard" className="space-y-4 h-[calc(100vh-180px)]">
               <div className="h-full">
                 <Whiteboard />
               </div>

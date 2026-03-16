@@ -54,10 +54,8 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-foreground overflow-hidden">
-      <div className="container mx-auto p-4 h-screen">
-        <JarvisInterface />
-      </div>
+    <div className="h-screen bg-black text-foreground overflow-hidden">
+      <JarvisInterface />
     </div>
   );
 };

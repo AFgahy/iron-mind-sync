@@ -292,7 +292,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </div>
             </TabsContent>
 
-            <TabsContent value="voice" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
+            <TabsContent value="voice" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <VoiceInput onVoiceInput={handleVoiceInput} />
                 <div className="jarvis-panel p-6">

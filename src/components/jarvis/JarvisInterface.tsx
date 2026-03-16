@@ -337,7 +337,7 @@ export const JarvisInterface = ({ className }: JarvisInterfaceProps) => {
               </div>
             </TabsContent>
 
-            <TabsContent value="image" className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)]">
+            <TabsContent value="image" className="space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
               <div className="jarvis-panel p-6">
                 <h3 className="text-lg font-semibold jarvis-glow mb-4 flex items-center gap-2">
                   <Image className="w-5 h-5" />
